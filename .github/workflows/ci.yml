@@ -37,8 +37,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_C_COMPILER=gcc \
             -DCMAKE_CXX_COMPILER=g++ \
-            -DCMAKE_C_FLAGS="-march=westmere -mtune=ivybridge -mfsgsbase -mxsave -mxsaveopt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0" \
-            -DCMAKE_CXX_FLAGS="-march=westmere -mtune=ivybridge -mfsgsbase -mxsave -mxsaveopt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0" \
+            -DCMAKE_C_FLAGS="-Ofast -march=westmere -mtune=ivybridge -mfsgsbase -mxsave -mxsaveopt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0" \
+            -DCMAKE_CXX_FLAGS="-Ofast -march=westmere -mtune=ivybridge -mfsgsbase -mxsave -mxsaveopt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0" \
             -DALSOFT_BACKEND_PIPEWIRE=ON \
             -DALSOFT_BACKEND_ALSA=OFF \
             -DALSOFT_BACKEND_PULSEAUDIO=OFF \
