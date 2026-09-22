@@ -854,6 +854,7 @@ set(CORE_HDRS
     core/hrtf_resource.hpp
     core/mastering.h
     core/mixer.h
+    core/mixparams.hpp
     core/resampler_limits.hpp
     core/storage_formats.h
     core/tsmefilter.hpp
@@ -864,6 +865,7 @@ if(HAVE_CXXMODULES)
     list(APPEND CORE_MODS
         core/bsinc_tables.cppm
         core/cubic_tables.cppm
+        core/device.cppm
         core/logging.cppm)
 else()
     list(APPEND CORE_HDRS core/logging.h)
@@ -992,7 +994,9 @@ set(ALC_HDRS
     alc/export_list.h
     alc/inprogext.h)
 if(HAVE_CXXMODULES)
-    list(APPEND CORE_MODS alc/context.cppm)
+    list(APPEND CORE_MODS
+        alc/context.cppm
+        alc/device.cppm)
 endif()
 
 if(ALSOFT_EAX)

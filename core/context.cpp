@@ -9,7 +9,6 @@
 #include <utility>
 
 #include "context.h"
-#include "device.h"
 #include "effectslot.h"
 #include "gsl/gsl"
 #include "ringbuffer.h"
@@ -17,9 +16,11 @@
 #include "voice_change.h"
 
 #if HAVE_CXXMODULES
+import core.device;
 import logging;
 #else
-#include "logging.h"
+#include "core/device.h"
+#include "core/logging.h"
 #endif
 
 

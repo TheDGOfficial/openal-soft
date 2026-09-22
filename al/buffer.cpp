@@ -44,11 +44,10 @@
 #include "AL/al.h"
 #include "AL/alext.h"
 
-#include "alc/device.h"
 #include "alc/inprogext.h"
+#include "alformat.hpp"
 #include "almalloc.h"
 #include "alnumeric.h"
-#include "core/device.h"
 #include "core/except.h"
 #include "core/resampler_limits.hpp"
 #include "core/voice.h"
@@ -65,11 +64,13 @@
 
 #if HAVE_CXXMODULES
 import alc.context;
+import alc.device;
 import format.types;
 import logging;
 import gsl;
 #else
 #include "alc/context.hpp"
+#include "alc/device.h"
 #include "alformattypes.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"

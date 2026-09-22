@@ -83,8 +83,6 @@
 #include "core/bformatdec.h"
 #include "core/bs2b.h"
 #include "core/cpu_caps.h"
-#include "core/devformat.h"
-#include "core/device.h"
 #include "core/effects/base.h"
 #include "core/effectslot.h"
 #include "core/filters/nfc.h"
@@ -97,7 +95,6 @@
 #include "core/uhjfilter.h"
 #include "core/voice.h"
 #include "core/voice_change.h"
-#include "device.h"
 #include "effects/base.h"
 #include "export_list.h"
 #include "flexarray.h"
@@ -171,10 +168,12 @@
 
 #if HAVE_CXXMODULES
 import alc.context;
+import alc.device;
 import format.types;
 import logging;
 #else
-#include "context.hpp"
+#include "alc/context.hpp"
+#include "alc/device.h"
 #include "alformattypes.hpp"
 #include "core/logging.h"
 #endif
@@ -2208,6 +2207,17 @@ catch(al::base_exception&) {
 DefineAlcAlias(alcGetString)
 
 namespace {
+
+/* Helper to get the device latency from the backend, including any fixed
+ * latency from post-processing.
+ */
+auto GetClockLatency(DeviceBase const *const device, BackendBase *const backend) -> ClockLatency
+{
+    auto ret = backend->getClockLatency();
+    ret.Latency += device->FixedLatency;
+    return ret;
+}
+
 auto GetIntegerv(al::Device *const device, ALCenum const param, std::span<ALCint> const values)
     -> std::size_t
 {
@@ -2523,6 +2533,7 @@ auto GetIntegerv(al::Device *const device, ALCenum const param, std::span<ALCint
     }
     return 0;
 }
+
 } // namespace
 
 ALC_API void ALC_APIENTRY alcGetIntegerv(ALCdevice *device, ALCenum param, ALCsizei size,
