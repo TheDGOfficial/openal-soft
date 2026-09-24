@@ -40,7 +40,7 @@ jobs:
             -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
             -DCMAKE_C_COMPILER=gcc-16 \
             -DCMAKE_CXX_COMPILER=g++-16 \
-            -DCMAKE_C_FLAGS="-Ofast -g0-march=westmere -mtune=ivybridge -funroll-loops -fomit-frame-pointer -mfpmath=sse -ftree-vectorize -fno-semantic-interposition -pipe -mfsgsbase -mxsave -mxsaveopt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0" \
+            -DCMAKE_C_FLAGS="-Ofast -g0 -march=westmere -mtune=ivybridge -funroll-loops -fomit-frame-pointer -mfpmath=sse -ftree-vectorize -fno-semantic-interposition -pipe -mfsgsbase -mxsave -mxsaveopt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0" \
             -DCMAKE_CXX_FLAGS="-Ofast -g0 -march=westmere -mtune=ivybridge -funroll-loops -fomit-frame-pointer -mfpmath=sse -ftree-vectorize -fno-semantic-interposition -pipe -mfsgsbase -mxsave -mxsaveopt -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0" \
             -DALSOFT_BACKEND_PIPEWIRE=ON \
             -DALSOFT_BACKEND_ALSA=OFF \
