@@ -5,7 +5,6 @@
 
 #include <array>
 #include <atomic>
-#include <bitset>
 #include <concepts>
 #include <functional>
 #include <string_view>
@@ -20,10 +19,14 @@
 
 #if ALSOFT_EAX
 #include <memory>
+
+#include "bitset.hpp"
 #include "eax/api.h"
-#include "eax/call.h"
-#include "eax/effect.h"
 #include "eax/fx_slot_index.h"
+
+class EaxCall;
+class EaxEffect;
+using EaxEffectUPtr = std::unique_ptr<EaxEffect>;
 #endif // ALSOFT_EAX
 
 
@@ -90,20 +93,19 @@ struct EffectSlot {
     auto eax_get_eax_fx_slot() const noexcept -> const EAX50FXSLOTPROPERTIES& { return mEax; }
 
     // Returns `true` if all sources should be updated, or `false` otherwise.
-    [[nodiscard]] auto eax_dispatch(const EaxCall &call) -> bool
-    { return call.is_get() ? eax_get(call) : eax_set(call); }
+    [[nodiscard]] auto eax_dispatch(const EaxCall &call) -> bool;
 
     void eax_commit();
 
 private:
-    enum {
-        eax_load_effect_dirty_bit,
-        eax_volume_dirty_bit,
-        eax_lock_dirty_bit,
-        eax_flags_dirty_bit,
-        eax_occlusion_dirty_bit,
-        eax_occlusion_lf_ratio_dirty_bit,
-        eax_dirty_bit_count
+    enum class EaxDirtyBit {
+        LoadEffect,
+        Volume,
+        Lock,
+        Flags,
+        Occlusion,
+        OcclusionLfRatio,
+        MaxValue = OcclusionLfRatio
     };
 
     struct Eax4State {
@@ -117,7 +119,7 @@ private:
     gsl::not_null<Context*> const mEaxALContext;
     EaxFxSlotIndexValue mEaxFXSlotIndex{};
     int mEaxVersion{}; // Current EAX version.
-    std::bitset<eax_dirty_bit_count> mEaxDf; // Dirty flags for the current EAX version.
+    al::bitset<EaxDirtyBit> mEaxDf; // Dirty flags for the current EAX version.
     EaxEffectUPtr mEaxEffect;
     Eax5State mEax123{}; // EAX1/EAX2/EAX3 state.
     Eax4State mEax4{}; // EAX4 state.
@@ -128,28 +130,13 @@ private:
      * the new value differs form the old one, and assigns the new value.
      */
     template<typename TValidator>
-    void eax_fx_slot_set(const EaxCall &call, auto &dst, size_t dirty_bit)
-    {
-        const auto &src = call.load<const std::remove_cvref_t<decltype(dst)>>();
-        TValidator{}(src);
-        if(dst != src)
-        {
-            mEaxDf.set(dirty_bit);
-            dst = src;
-        }
-    }
+    void eax_fx_slot_set(const EaxCall &call, auto &dst, EaxDirtyBit dirty_bit);
 
     /* Gets a new value from EAX call, validates it, sets a dirty flag without
      * comparing the values, and assigns the new value.
      */
     template<typename TValidator>
-    void eax_fx_slot_set_dirty(const EaxCall &call, auto &dst, size_t dirty_bit)
-    {
-        const auto &src = call.load<const std::remove_cvref_t<decltype(dst)>>();
-        TValidator{}(src);
-        mEaxDf.set(dirty_bit);
-        dst = src;
-    }
+    void eax_fx_slot_set_dirty(const EaxCall &call, auto &dst, EaxDirtyBit dirty_bit);
 
     [[nodiscard]] constexpr auto eax4_fx_slot_is_legacy() const noexcept -> bool
     { return mEaxFXSlotIndex < 2; }
@@ -190,8 +177,8 @@ private:
     // Returns `true` if all sources should be updated, or `false` otherwise.
     bool eax_set(const EaxCall& call);
 
-    void eax_fx_slot_commit_property(auto &state, std::bitset<eax_dirty_bit_count> &dst_df,
-        size_t dirty_bit, std::invocable<decltype(mEax)> auto member) noexcept
+    void eax_fx_slot_commit_property(auto &state, al::bitset<EaxDirtyBit> &dst_df,
+        EaxDirtyBit const dirty_bit, std::invocable<decltype(mEax)> auto member) noexcept
     {
         if(mEaxDf.test(dirty_bit))
         {
@@ -200,8 +187,8 @@ private:
         }
     }
 
-    void eax4_fx_slot_commit(std::bitset<eax_dirty_bit_count>& dst_df);
-    void eax5_fx_slot_commit(Eax5State& state, std::bitset<eax_dirty_bit_count>& dst_df);
+    void eax4_fx_slot_commit(al::bitset<EaxDirtyBit>& dst_df);
+    void eax5_fx_slot_commit(Eax5State& state, al::bitset<EaxDirtyBit>& dst_df);
 
     // `alAuxiliaryEffectSloti(effect_slot, AL_EFFECTSLOT_EFFECT, effect)`
     void eax_set_efx_slot_effect(EaxEffect const &effect);
