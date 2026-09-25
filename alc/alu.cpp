@@ -78,9 +78,11 @@
 
 #if HAVE_CXXMODULES
 import bsinc_tables;
+import cemath;
 import core.device;
 import cubic_tables;
 #else
+#include "cemath.hpp"
 #include "core/bsinc_tables.hpp"
 #include "core/cubic_tables.hpp"
 #include "core/device.h"
@@ -741,16 +743,15 @@ constexpr auto CalcRotatorSize(std::size_t const l) noexcept -> std::size_t
     return 0;
 }
 
-struct RotatorCoeffs {
-    struct CoeffValues {
-        float u, v, w;
-    };
-    std::array<CoeffValues, CalcRotatorSize(MaxAmbiOrder)> mCoeffs{};
+struct RotatorCoeffValues {
+    float u, v, w;
+};
 
+struct RotatorCoeffs : std::array<RotatorCoeffValues, CalcRotatorSize(MaxAmbiOrder)> {
+    constexpr
     RotatorCoeffs() noexcept
     {
-        auto coeffs = mCoeffs.begin();
-
+        auto coeffs = this->begin();
         for(auto const l : std::views::iota(2, int{MaxAmbiOrder+1}))
         {
             for(auto const n : std::views::iota(-l, l+1))
@@ -771,22 +772,22 @@ struct RotatorCoeffs {
                      *     (1.0-d) * -0.5;
                      */
 
-                    auto const denom = gsl::narrow_cast<double>((std::abs(n) == l) ?
+                    auto const denom = gsl::narrow_cast<double>((ce::abs(n) == l) ?
                           (2*l) * (2*l - 1) : (l*l - n*n));
 
                     if(m == 0)
                     {
-                        coeffs->u = gsl::narrow_cast<float>(std::sqrt(l * l / denom));
-                        coeffs->v = gsl::narrow_cast<float>(std::sqrt((l-1) * l / denom) * -1.0);
+                        coeffs->u = gsl::narrow_cast<float>(ce::sqrt(l * l / denom));
+                        coeffs->v = gsl::narrow_cast<float>(ce::sqrt((l-1) * l / denom) * -1.0);
                         coeffs->w = 0.0f;
                     }
                     else
                     {
-                        const auto abs_m = std::abs(m);
-                        coeffs->u = gsl::narrow_cast<float>(std::sqrt((l*l - m*m) / denom));
-                        coeffs->v = gsl::narrow_cast<float>(std::sqrt((l+abs_m-1) * (l+abs_m)
+                        const auto abs_m = ce::abs(m);
+                        coeffs->u = gsl::narrow_cast<float>(ce::sqrt((l*l - m*m) / denom));
+                        coeffs->v = gsl::narrow_cast<float>(ce::sqrt((l+abs_m-1) * (l+abs_m)
                             / denom) * 0.5);
-                        coeffs->w = gsl::narrow_cast<float>(std::sqrt((l-abs_m-1) * (l-abs_m)
+                        coeffs->w = gsl::narrow_cast<float>(ce::sqrt((l-abs_m-1) * (l-abs_m)
                             / denom) * -0.5);
                     }
                     ++coeffs;
@@ -795,42 +796,37 @@ struct RotatorCoeffs {
         }
     }
 };
-const auto RotatorCoeffArray = RotatorCoeffs{};
+auto constexpr RotatorCoeffArray = RotatorCoeffs{};
 
-/**
- * Given the matrix, pre-filled with the (zeroth- and) first-order rotation
- * coefficients, this fills in the coefficients for the higher orders up to and
- * including the given order. The matrix is in ACN layout.
- */
-void AmbiRotator(AmbiRotateMatrix &matrix, int const order) noexcept NONBLOCKING
-{
-    /* Don't do anything for < 2nd order. */
-    if(order < 2) return;
+namespace rotator {
 
-    constexpr auto P = [](isize const i, isize const l, isize const a, isize const n,
-        usize const last_base, AmbiRotateMatrix const &R)
+    [[nodiscard]] constexpr
+    auto P(isize const i, isize const l, isize const a, isize const n, usize const last_base,
+        AmbiRotateMatrix const &R) noexcept -> float
     {
-        auto const ip2 = (i+2_z).reinterpret_as<usize>().c_val;
+        auto const ip2 = (i+2).reinterpret_as<usize>().c_val;
         auto const ri1 =  R[ 1+2][ip2];
         auto const rim1 = R[-1+2][ip2];
         auto const ri0 =  R[ 0+2][ip2];
 
-        auto const lm1 = (l-1_z).reinterpret_as<usize>().c_val;
+        auto const lm1 = (l-1).reinterpret_as<usize>().c_val;
         auto const x = (last_base + lm1 + a.reinterpret_as<usize>()).c_val;
         if(n == -l)
             return ri1*R[last_base.c_val][x] + rim1*R[last_base.c_val + lm1*2][x];
         if(n == l)
             return ri1*R[last_base.c_val + lm1*2][x] - rim1*R[last_base.c_val][x];
         return ri0*R[(last_base + lm1 + n.reinterpret_as<usize>()).c_val][x];
-    };
+    }
 
-    constexpr auto U = [P](isize const l, isize const m, isize const n,
-        usize const last_base, AmbiRotateMatrix const &R)
+    [[nodiscard]] constexpr
+    auto U(isize const l, isize const m, isize const n, usize const last_base,
+        AmbiRotateMatrix const &R) noexcept -> float
     {
         return P(0, l, m, n, last_base, R);
-    };
-    constexpr auto V = [P](isize const l, isize const m, isize const n,
-        usize const last_base, AmbiRotateMatrix const &R)
+    }
+    [[nodiscard]] constexpr
+    auto V(isize const l, isize const m, isize const n, usize const last_base,
+        AmbiRotateMatrix const &R) noexcept -> float
     {
         using namespace std::numbers;
         if(m > 0)
@@ -844,9 +840,10 @@ void AmbiRotator(AmbiRotateMatrix &matrix, int const order) noexcept NONBLOCKING
         auto const p0 = P( 1, l,  m+1, n, last_base, R);
         auto const p1 = P(-1, l, -m-1, n, last_base, R);
         return d ? p1*sqrt2_v<float> : (p0 + p1);
-    };
-    constexpr auto W = [P](isize const l, isize const m, isize const n,
-        usize const last_base, AmbiRotateMatrix const &R)
+    }
+    [[nodiscard]] constexpr
+    auto W(isize const l, isize const m, isize const n, usize const last_base,
+        AmbiRotateMatrix const &R) noexcept -> float
     {
         Expects(m != 0);
         if(m > 0)
@@ -858,10 +855,22 @@ void AmbiRotator(AmbiRotateMatrix &matrix, int const order) noexcept NONBLOCKING
         auto const p0 = P( 1, l,  m-1, n, last_base, R);
         auto const p1 = P(-1, l, -m+1, n, last_base, R);
         return p0 - p1;
-    };
+    }
+
+}
+
+/**
+ * Given the matrix, pre-filled with the (zeroth- and) first-order rotation
+ * coefficients, this fills in the coefficients for the higher orders up to and
+ * including the given order. The matrix is in ACN layout.
+ */
+void AmbiRotator(AmbiRotateMatrix &matrix, int const order) noexcept NONBLOCKING
+{
+    /* Don't do anything for < 2nd order. */
+    if(order < 2) return;
 
     // compute rotation matrix of each subsequent band recursively
-    auto coeffs = RotatorCoeffArray.mCoeffs.cbegin();
+    auto coeffs = RotatorCoeffArray.cbegin();
     auto base_idx = 4_uz;
     auto last_base = 1_uz;
     for(auto const l : std::views::iota(2_isize, isize{order}+1))
@@ -876,11 +885,11 @@ void AmbiRotator(AmbiRotateMatrix &matrix, int const order) noexcept NONBLOCKING
 
                 // computes Eq.8.1
                 if(const auto u = coeffs->u; u != 0.0f)
-                    r += u * U(l, m, n, last_base, matrix);
+                    r += u * rotator::U(l, m, n, last_base, matrix);
                 if(const auto v = coeffs->v; v != 0.0f)
-                    r += v * V(l, m, n, last_base, matrix);
+                    r += v * rotator::V(l, m, n, last_base, matrix);
                 if(const auto w = coeffs->w; w != 0.0f)
-                    r += w * W(l, m, n, last_base, matrix);
+                    r += w * rotator::W(l, m, n, last_base, matrix);
 
                 matrix[y][x] = r;
                 ++coeffs;

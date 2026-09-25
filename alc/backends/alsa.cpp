@@ -37,7 +37,6 @@
 #include <vector>
 
 #include "alc/alconfig.h"
-#include "alformat.hpp"
 #include "alnumeric.h"
 #include "althrd_setname.h"
 #include "core/helpers.h"
@@ -48,11 +47,15 @@
 #include <alsa/asoundlib.h>
 
 #if HAVE_CXXMODULES
+import backends.exception;
 import core.device;
+import format;
 import gsl;
 import logging;
 import zstring_view;
 #else
+#include "alc/backends/exception.hpp"
+#include "alformat.hpp"
 #include "alformatzsv.hpp"
 #include "core/device.h"
 #include "core/logging.h"

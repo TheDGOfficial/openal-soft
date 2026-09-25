@@ -75,18 +75,24 @@
 #include "eax/call.h"
 #include "eax/exception.h"
 #include "eax/fx_slot_index.h"
-#include "eax/utils.h"
+#if HAVE_CXXMODULES
+import eax.validator;
+#else
+#include "eax/validator.hpp"
+#endif
 #endif
 
 #if HAVE_CXXMODULES
 import alc.context;
 import alc.device;
-import format.types;
+import format;
 import gsl;
 import logging;
+import types;
 #else
 #include "alc/context.hpp"
 #include "alc/device.h"
+#include "alformat.hpp"
 #include "alformattypes.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"

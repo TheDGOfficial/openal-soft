@@ -20,7 +20,6 @@
 #include "alc/alu.h"
 #include "alc/backends/base.h"
 #include "alnumeric.h"
-#include "altypes.hpp"
 #include "atomic.h"
 #include "core/async_event.h"
 #include "core/effectslot.h"
@@ -38,15 +37,19 @@
 #include "al/eax/call.h"
 #include "al/eax/exception.h"
 #include "al/eax/globals.h"
-#include "al/eax/utils.h"
+#if HAVE_CXXMODULES
+import eax.validator;
+#else
+#include "al/eax/validator.hpp"
+#endif
 #endif // ALSOFT_EAX
 
 #if HAVE_CXXMODULES
 import alc.context;
 import alc.device;
-import format.types;
 import gsl;
 import logging;
+import types;
 #else
 #include "alc/context.hpp"
 #include "alc/device.h"

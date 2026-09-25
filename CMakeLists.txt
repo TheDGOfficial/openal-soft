@@ -743,6 +743,7 @@ set(COMMON_HDRS
     common/altypes.hpp
     common/atomic.h
     common/bitset.hpp
+    common/cemath.hpp
     common/comptr.h
     common/dynload.h
     common/dlopennote.h
@@ -773,7 +774,9 @@ set(COMMON_HDRS
 if(HAVE_CXXMODULES)
     list(APPEND COMMON_MODS
         alsoft-modules/gsl.cppm
-        common/alformattypes.cppm
+        common/alformat.cppm
+        common/altypes.cppm
+        common/cemath.cppm
         common/hann_window.cppm
         common/phase_shifter.cppm
         common/zstring_view.cppm
@@ -1018,8 +1021,12 @@ if(ALSOFT_EAX)
         al/eax/fx_slots.h
         al/eax/globals.h
         al/eax/presets.hpp
-        al/eax/utils.h
     )
+    if(HAVE_CXXMODULES)
+        list(APPEND CORE_MODS al/eax/validator.cppm)
+    else()
+        list(APPEND OPENAL_HDRS al/eax/validator.hpp)
+    endif()
 endif()
 
 # Include SIMD mixers
@@ -1075,6 +1082,11 @@ else()
 endif()
 
 set(BACKENDS "")
+if(HAVE_CXXMODULES)
+    list(APPEND CORE_MODS alc/backends/exception.cppm)
+else()
+    list(APPEND ALC_HDRS alc/backends/exception.hpp)
+endif()
 list(APPEND ALC_SRCS
     alc/backends/base.cpp
     # Default backends, always available

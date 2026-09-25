@@ -11,7 +11,6 @@
 #include "AL/efx.h"
 
 #include "alnumeric.h"
-#include "altypes.hpp"
 #include "effects.h"
 
 #if ALSOFT_EAX
@@ -20,15 +19,21 @@
 #include "al/eax/effect.h"
 #include "al/eax/exception.h"
 #include "al/eax/presets.hpp"
-#include "al/eax/utils.h"
+#if HAVE_CXXMODULES
+import eax.validator;
+#else
+#include "al/eax/validator.hpp"
+#endif
 #endif // ALSOFT_EAX
 
 #if HAVE_CXXMODULES
 import alc.context;
 import logging;
 import gsl;
+import types;
 #else
 #include "alc/context.hpp"
+#include "altypes.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"
 #endif

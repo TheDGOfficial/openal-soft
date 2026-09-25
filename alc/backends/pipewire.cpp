@@ -47,7 +47,6 @@
 
 #include "alc/alconfig.h"
 #include "alc/backends/base.h"
-#include "alformat.hpp"
 #include "alstring.h"
 #include "core/helpers.h"
 #include "dlopennote.h"
@@ -134,12 +133,16 @@ constexpr auto PwIdAny = PW_ID_ANY;
 DIAGNOSTIC_POP;
 
 #if HAVE_CXXMODULES
+import backends.exception;
 import core.device;
-import format.types;
+import format;
 import gsl;
 import logging;
+import types;
 import zstring_view;
 #else
+#include "alc/backends/exception.hpp"
+#include "alformat.hpp"
 #include "alformattypes.hpp"
 #include "alformatzsv.hpp"
 #include "core/device.h"
