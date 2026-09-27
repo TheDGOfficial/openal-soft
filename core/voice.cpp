@@ -36,6 +36,7 @@
 #include "resampler_limits.hpp"
 #include "ringbuffer.h"
 #include "uhjfilter.h"
+#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
 import core.device;
@@ -989,7 +990,7 @@ void Voice::mix(State const vstate, ContextBase *const context, nanoseconds cons
 {
     ASSUME(samplesToDo > 0);
 
-    auto &device = *context->mDevice;
+    auto &device = context->mDevice;
     auto const numSends = device.NumAuxSends;
 
     /* Get voice info */

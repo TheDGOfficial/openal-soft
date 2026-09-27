@@ -760,6 +760,7 @@ set(COMMON_HDRS
     common/vecmat.h
     common/vector.h
     common/zstring_view.hpp
+    common/zudl.hpp
     gsl/include/gsl/algorithm
     gsl/include/gsl/assert
     gsl/include/gsl/byte
@@ -773,6 +774,7 @@ set(COMMON_HDRS
 )
 if(HAVE_CXXMODULES)
     list(APPEND COMMON_MODS
+        alsoft-modules/fmtlib.cppm
         alsoft-modules/gsl.cppm
         common/alformat.cppm
         common/altypes.cppm
@@ -867,6 +869,7 @@ set(CORE_HDRS
 if(HAVE_CXXMODULES)
     list(APPEND CORE_MODS
         core/bsinc_tables.cppm
+        core/context.cppm
         core/cubic_tables.cppm
         core/device.cppm
         core/logging.cppm)
@@ -1770,7 +1773,7 @@ else()
                 "ALC_API=${EXPORT_DECL}" "AL_API=${EXPORT_DECL}" ${CPP_DEFS})
             target_compile_options(alsoft.router-modules PRIVATE ${C_FLAGS})
             target_link_libraries(alsoft.router-modules PRIVATE Threads::Threads alsoft::fmt
-                PUBLIC alsoft::buildapi-modules)
+                PUBLIC alsoft::buildapi-modules alsoft::common)
             set_target_properties(alsoft.router-modules PROPERTIES ${ALSOFT_STD_VERSION_PROPS}
                 POSITION_INDEPENDENT_CODE TRUE)
             set(ROUTER_MODULES_TARGET alsoft.router-modules)

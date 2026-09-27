@@ -99,13 +99,12 @@
 #include "effects/base.h"
 #include "export_list.h"
 #include "flexarray.h"
-#include "fmt/format.h"
-#include "fmt/ranges.h"
 #include "gsl/gsl"
 #include "inprogext.h"
 #include "intrusive_ptr.h"
 #include "opthelpers.h"
 #include "strutils.hpp"
+#include "zudl.hpp"
 
 #include "backends/base.h"
 #include "backends/null.h"
@@ -171,6 +170,7 @@
 import alc.context;
 import alc.device;
 import backends.exception;
+import fmtlib;
 import format;
 import logging;
 import types;
@@ -181,6 +181,8 @@ import types;
 #include "alformat.hpp"
 #include "alformattypes.hpp"
 #include "core/logging.h"
+#include "fmt/format.h"
+#include "fmt/ranges.h"
 #endif
 
 

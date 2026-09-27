@@ -44,6 +44,7 @@
 #include "ringbuffer.h"
 #include "strutils.hpp"
 #include "vector.h"
+#include "zudl.hpp"
 
 #ifndef WAVE_FORMAT_IEEE_FLOAT
 #define WAVE_FORMAT_IEEE_FLOAT  0x0003
@@ -55,9 +56,11 @@ import core.device;
 import format;
 import gsl;
 import logging;
+import types;
 #else
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
+#include "altypes.hpp"
 #include "core/device.h"
 #include "core/logging.h"
 #include "gsl/gsl"

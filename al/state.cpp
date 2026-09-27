@@ -42,13 +42,13 @@
 #include "alc/inprogext.h"
 #include "alnumeric.h"
 #include "atomic.h"
-#include "core/context.h"
 #include "core/mixer/defs.h"
 #include "core/voice.h"
 #include "direct_defs.h"
 #include "intrusive_ptr.h"
 #include "opthelpers.h"
 #include "strutils.hpp"
+#include "zudl.hpp"
 
 #if ALSOFT_EAX
 #include "eax/alapi.hpp"

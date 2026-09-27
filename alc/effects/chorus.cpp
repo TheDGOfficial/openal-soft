@@ -36,7 +36,6 @@
 #include "alnumeric.h"
 #include "core/ambidefs.h"
 #include "core/bufferline.h"
-#include "core/context.h"
 #include "core/effects/base.h"
 #include "core/effectslot.h"
 #include "core/filters/splitter.h"
@@ -45,11 +44,14 @@
 #include "core/resampler_limits.hpp"
 #include "intrusive_ptr.h"
 #include "opthelpers.h"
+#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
+import core.context;
 import core.device;
 import cubic_tables;
 #else
+#include "core/context.h"
 #include "core/cubic_tables.hpp"
 #include "core/device.h"
 #endif
@@ -185,8 +187,8 @@ void ChorusState::update(const ContextBase *context, const EffectSlotBase *slot,
     /* The LFO depth is scaled to be relative to the sample delay. Clamp the
      * delay and depth to allow enough padding for resampling.
      */
-    auto const device = al::get_not_null(context->mDevice);
-    auto const frequency = static_cast<float>(device->mSampleRate);
+    auto const &device = context->mDevice;
+    auto const frequency = static_cast<float>(device.mSampleRate);
 
     mWaveform = props.Waveform;
 

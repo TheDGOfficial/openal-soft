@@ -47,7 +47,6 @@
 #include "core/ambidefs.h"
 #include "core/bformatdec.h"
 #include "core/bs2b.h"
-#include "core/context.h"
 #include "core/effectslot.h"
 #include "core/filters/nfc.h"
 #include "core/filters/splitter.h"
@@ -59,6 +58,7 @@
 #include "flexarray.h"
 #include "intrusive_ptr.h"
 #include "opthelpers.h"
+#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
 import alc.context;
@@ -1439,8 +1439,8 @@ void aluInitRenderer(al::Device *const device, int const hrtf_id,
 
 void aluInitEffectPanning(EffectSlotBase *slot, al::Context *context)
 {
-    auto const device = al::get_not_null(context->mDevice);
-    auto const count = AmbiChannelsFromOrder(device->mAmbiOrder);
+    auto &device = context->mDevice;
+    auto const count = AmbiChannelsFromOrder(device.mAmbiOrder);
 
     slot->mWetBuffer.resize(count);
 

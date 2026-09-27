@@ -4,6 +4,7 @@ module;
 #include <winnt.h>
 
 #include <atomic>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -11,12 +12,10 @@ module;
 #include <utility>
 #include <vector>
 
-#include "fmt/base.h"
-#include "fmt/ostream.h"
-
 
 export module alsoft.router;
 
+import fmtlib;
 import openal;
 
 export {

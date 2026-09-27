@@ -63,6 +63,7 @@
 #include <vector>
 
 #include "alc/alconfig.h"
+#include "almalloc.h"
 #include "alnumeric.h"
 #include "alstring.h"
 #include "althrd_setname.h"
@@ -72,6 +73,7 @@
 #include "opthelpers.h"
 #include "ringbuffer.h"
 #include "strutils.hpp"
+#include "zudl.hpp"
 
 #if ALSOFT_UWP
 #include <winrt/Windows.Media.Core.h> // !!This is important!!
