@@ -9,8 +9,8 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
-#include <fstream>
 #include <functional>
+#include <istream>
 #include <iterator>
 #include <memory>
 #include <mutex>
@@ -27,7 +27,6 @@
 #include "alnumeric.h"
 #include "alstring.h"
 #include "ambidefs.h"
-#include "filesystem.h"
 #include "filters/splitter.h"
 #include "gsl/gsl"
 #include "helpers.h"
@@ -38,10 +37,12 @@
 #include "zudl.hpp"
 
 #if HAVE_CXXMODULES
+import filesystem;
 import format;
 import logging;
 #else
 #include "alformat.hpp"
+#include "filesystem.h"
 #include "logging.h"
 #endif
 
@@ -285,10 +286,7 @@ void DirectHrtfState::build(HrtfStore const *const Hrtf, unsigned const irSize,
     std::ranges::transform(std::views::iota(0_uz, mChannels.size()), (mChannels
         | std::views::transform(&HrtfChannelState::mHfScale)).begin(),
         [AmbiOrderHFGain](std::size_t const idx)
-    {
-        auto const order = AmbiIndex::OrderFromChannel[idx];
-        return AmbiOrderHFGain[order.c_val];
-    });
+    { return AmbiOrderHFGain[AmbiIndex::OrderFromChannel[idx]]; });
 
     auto min_delay = unsigned{HrtfHistoryLength * HrirDelayFracOne};
     auto max_delay = 0u;
