@@ -73,23 +73,27 @@
 #include <variant>
 #include <vector>
 #ifdef _WIN32
+#ifdef _MSVC_STL_UPDATE
+#include <filesystem> // HACK: For MSVC?
+#endif
 #include <io.h>
 #include <fcntl.h>
 #endif
 
 #include "alnumeric.h"
 #include "alstring.h"
-#include "common/alhelpers.hpp"
 #include "zudl.hpp"
 
 #include "win_main_utf8.h"
 
 #if HAVE_CXXMODULES
+import alhelpers;
 import filesystem;
 import fmtlib;
 import gsl;
 import openal;
 import types;
+import zstring_view;
 
 #else
 
@@ -97,7 +101,9 @@ import types;
 #include "AL/al.h"
 #include "AL/alext.h"
 
+#include "alformatzsv.hpp"
 #include "altypes.hpp"
+#include "common/alhelpers.hpp"
 #include "filesystem.h"
 #include "fmt/base.h"
 #include "fmt/ostream.h"
@@ -401,14 +407,15 @@ auto LafStream::readChunk() -> u32
         * mNumEnabled).c_val);
     if(!infile.read(mSampleChunk.data(), toread)) [[unlikely]]
     {
-        const auto framesize = BytesFromQuality(mQuality).as<u64>() * mNumEnabled;
+        const auto framesize = BytesFromQuality(mQuality) * mNumEnabled;
         const auto samplesread = i64{infile.gcount()}.saturate_as<u64>() / framesize;
         mCurrentSample += samplesread;
         if(mSampleCount < ~0_u64)
             fmt::println(std::cerr, "Premature end of file ({} of {} samples)",
                 mCurrentSample.c_val, mSampleCount.c_val);
         mSampleCount = mCurrentSample;
-        std::ranges::fill(mSampleChunk | std::views::drop((numsamples*framesize).c_val), char{});
+        auto const byteoffset = (numsamples * framesize).cast_to<isize>();
+        std::ranges::fill(mSampleChunk | std::views::drop(byteoffset.c_val), char{});
         return samplesread.cast_to<u32>();
     }
     std::ranges::fill(mSampleChunk | std::views::drop(toread), char{});
@@ -1196,7 +1203,7 @@ catch(std::exception& e) {
     fmt::println(std::cerr, "Error playing {}:\n  {}", fname, e.what());
 }
 
-auto main(std::span<std::string_view> args) -> int
+auto main(std::span<al::zstring_view> args) -> int
 {
     /* Print out usage if no arguments were specified */
     if(args.size() < 2)
@@ -1404,7 +1411,7 @@ auto main(std::span<std::string_view> args) -> int
 
 auto main(int const argc, char **const argv) -> int
 {
-    auto args = std::vector<std::string_view>(gsl::narrow<unsigned>(argc));
+    auto args = std::vector<al::zstring_view>(gsl::narrow<unsigned>(argc));
     std::ranges::copy(std::views::counted(argv, argc), args.begin());
     return main(std::span{args});
 }
