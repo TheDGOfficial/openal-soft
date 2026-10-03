@@ -17,10 +17,10 @@
 #include "AL/al.h"
 #include "AL/alext.h"
 
-#include "almalloc.h"
 #include "altypes.hpp"
 #include "core/context.h"
 #include "core/voice.h"
+#include "disable_alloc.hpp"
 #include "gsl/gsl"
 #include "intrusive_ptr.h"
 
@@ -112,21 +112,21 @@ struct Source {
 
     /** Direct filter and auxiliary send info. */
     struct DirectData {
-        float mGain{};
-        float mGainHF{};
-        float mHFReference{};
-        float mGainLF{};
-        float mLFReference{};
+        float mGain;
+        float mGainHF;
+        float mHFReference;
+        float mGainLF;
+        float mLFReference;
     };
     DirectData mDirect;
 
     struct SendData {
         intrusive_ptr<EffectSlot> mSlot;
-        float mGain{};
-        float mGainHF{};
-        float mHFReference{};
-        float mGainLF{};
-        float mLFReference{};
+        float mGain;
+        float mGainHF;
+        float mHFReference;
+        float mGainLF;
+        float mLFReference;
     };
     std::array<SendData, MaxSendCount> mSend;
 
