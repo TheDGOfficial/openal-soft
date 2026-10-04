@@ -50,6 +50,8 @@
 #include <bit>
 #include <chrono>
 #include <condition_variable>
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <functional>
 #include <future>
@@ -1205,7 +1207,7 @@ struct WasapiPlayback final : BackendBase {
     std::condition_variable mProcCond;
     HRESULT mProcResult{E_FAIL};
 
-    enum class ThreadState : u8::value_t {
+    enum class ThreadState : std::uint8_t {
         Initializing,
         Waiting,
         Playing,
@@ -1213,7 +1215,7 @@ struct WasapiPlayback final : BackendBase {
     };
     ThreadState mState{ThreadState::Initializing};
 
-    enum class ThreadAction : u8::value_t {
+    enum class ThreadAction : std::uint8_t {
         Nothing,
         Configure,
         Play,
@@ -1939,7 +1941,7 @@ auto WasapiPlayback::initSpatial(DeviceHelper &helper, DeviceHandle &mmdev, Spat
     mOutUpdateSize = maxFrames;
     mOutBufferSize = mOutUpdateSize*2;
 
-    mDevice->mUpdateSize = gsl::narrow_cast<unsigned>((u64::value_t{mOutUpdateSize}
+    mDevice->mUpdateSize = gsl::narrow_cast<unsigned>((std::uint64_t{mOutUpdateSize}
         *mDevice->mSampleRate + (mFormat.Format.nSamplesPerSec-1))
         / mFormat.Format.nSamplesPerSec);
     mDevice->mBufferSize = mDevice->mUpdateSize*2;
@@ -2288,7 +2290,7 @@ auto WasapiPlayback::resetProxy(DeviceHelper &helper, DeviceHandle &mmdev,
          * implicitly two update periods on the device.
          */
         mOutUpdateSize = buffer_len;
-        mDevice->mUpdateSize = gsl::narrow_cast<unsigned>(u64::value_t{buffer_len}
+        mDevice->mUpdateSize = gsl::narrow_cast<unsigned>(std::uint64_t{buffer_len}
             * mDevice->mSampleRate / mFormat.Format.nSamplesPerSec);
         mDevice->mBufferSize = mDevice->mUpdateSize * 2;
     }
@@ -2296,7 +2298,7 @@ auto WasapiPlayback::resetProxy(DeviceHelper &helper, DeviceHandle &mmdev,
     {
         mOutUpdateSize = RefTime2Samples(period_time, mFormat.Format.nSamplesPerSec);
 
-        mDevice->mBufferSize = gsl::narrow_cast<unsigned>(u64::value_t{buffer_len}
+        mDevice->mBufferSize = gsl::narrow_cast<unsigned>(std::uint64_t{buffer_len}
             * mDevice->mSampleRate / mFormat.Format.nSamplesPerSec);
         mDevice->mUpdateSize = std::min(RefTime2Samples(period_time, mDevice->mSampleRate),
             mDevice->mBufferSize/2u);
@@ -2395,7 +2397,7 @@ struct WasapiCapture final : BackendBase {
     std::condition_variable mProcCond;
     HRESULT mProcResult{E_FAIL};
 
-    enum class ThreadState : u8::value_t {
+    enum class ThreadState : std::uint8_t {
         Initializing,
         Waiting,
         Recording,
@@ -2403,7 +2405,7 @@ struct WasapiCapture final : BackendBase {
     };
     ThreadState mState{ThreadState::Initializing};
 
-    enum class ThreadAction : u8::value_t {
+    enum class ThreadAction : std::uint8_t {
         Nothing,
         Record,
         Quit
@@ -2480,7 +2482,8 @@ void WasapiCapture::recordProc(IAudioClient *client, IAudioCaptureClient *captur
                 auto dstframes = std::size_t{};
                 if(mSampleConv)
                 {
-                    static constexpr auto lenlimit = i32::max().as<usize>().c_val;
+                    static constexpr auto lenlimit = std::size_t{
+                        std::numeric_limits<std::int32_t>::max()};
                     auto *srcdata = LPCVOID{rdata};
                     auto srcframes = unsigned{numsamples};
 
