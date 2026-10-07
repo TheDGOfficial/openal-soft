@@ -70,7 +70,14 @@ struct Buffer : BufferStorage {
         return al::intrusive_ptr{this};
     }
 
-    static void SetName(gsl::not_null<al::Context*> context, ALuint id, std::string_view name);
+    Buffer() = default;
+    Buffer(const Buffer&) = delete;
+    Buffer(Buffer&&) = delete;
+    ~Buffer() = default;
+    auto operator=(const Buffer&) -> Buffer& = delete;
+    auto operator=(Buffer&&) -> Buffer& = delete;
+
+    static void SetName(al::Context& context, ALuint id, std::string_view name);
 
     DISABLE_ALLOC
 
