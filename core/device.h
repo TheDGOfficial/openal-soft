@@ -4,6 +4,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <span>
@@ -11,7 +12,6 @@
 #include <variant>
 
 #include "alformat.hpp"
-#include "altypes.hpp"
 #include "ambidefs.h"
 #include "atomic.h"
 #include "bitset.hpp"
@@ -265,7 +265,7 @@ struct DeviceBase {
     al::atomic_unique_ptr<ContextArray> mContexts;
 
     /** Returns the number of contexts remaining on the device. */
-    [[nodiscard]] auto removeContext(ContextBase *context) -> usize;
+    [[nodiscard]] auto removeContext(ContextBase *context) -> std::size_t;
 
     [[nodiscard]]
     auto bytesFromFmt() const noexcept -> unsigned { return BytesFromDevFmt(FmtType); }
@@ -335,15 +335,15 @@ struct DeviceBase {
         NONBLOCKING;
 
     /* Caller must lock the device state, and the mixer must not be running. */
-    void doDisconnect(std::string&& msg);
-
     template<typename ...Args>
     void handleDisconnect(al::format_string<Args...> fmt, Args&& ...args)
-    { doDisconnect(al::format(std::move(fmt), std::forward<Args>(args)...)); }
+    { doDisconnect(fmt.get(), al::make_format_args(args...)); }
 
 private:
     [[nodiscard]]
     auto renderSamples(unsigned numSamples) noexcept NONBLOCKING -> unsigned;
+
+    void doDisconnect(al::string_view fmt, al::format_args&& args);
 
 protected:
     explicit DeviceBase(DeviceType type);

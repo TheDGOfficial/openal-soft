@@ -293,9 +293,6 @@ std::array BackendList{
 #endif
 };
 
-BackendFactory *PlaybackFactory{};
-BackendFactory *CaptureFactory{};
-
 
 [[nodiscard]] constexpr auto GetNoErrorString() noexcept { return "No Error"; }
 [[nodiscard]] constexpr auto GetInvalidDeviceString() noexcept { return "Invalid Device"; }
@@ -690,9 +687,8 @@ void alc_initconfig()
          * the normal backends are usable, rather than pretending there is a
          * device but outputs nowhere.
          */
-        const auto reversenamerange = backends | std::views::reverse;
-        const auto iter = std::ranges::find(reversenamerange, "null"sv, &BackendInfo::name);
-        backends = std::span{backends.begin(), iter.base()};
+        auto const iter = std::ranges::find(backends, "null"sv, &BackendInfo::name);
+        backends = std::span{backends.begin(), iter};
     }
 
     std::ignore = std::ranges::find_if(backends, [](const BackendInfo &backend)
@@ -3805,37 +3801,3 @@ catch(std::exception &e) {
     return ALC_FALSE;
 }
 DefineAlcAlias(alcReopenDeviceSOFT)
-
-/************************************************
- * ALC event query functions
- ************************************************/
-
-FORCE_ALIGN auto ALC_APIENTRY alcEventIsSupportedSOFT(ALCenum eventType, ALCenum deviceType)
-    noexcept -> ALCenum
-{
-    auto etype = alc::GetEventType(eventType);
-    if(!etype)
-    {
-        WARN("Invalid event type: {:#04x}", as_unsigned(eventType));
-        al::Device::SetGlobalError(ALC_INVALID_ENUM);
-        return ALC_FALSE;
-    }
-
-    auto supported = alc::EventSupport::NoSupport;
-    switch(deviceType)
-    {
-    case ALC_PLAYBACK_DEVICE_SOFT:
-        if(PlaybackFactory)
-            supported = PlaybackFactory->queryEventSupport(*etype, BackendType::Playback);
-        return al::to_underlying(supported);
-
-    case ALC_CAPTURE_DEVICE_SOFT:
-        if(CaptureFactory)
-            supported = CaptureFactory->queryEventSupport(*etype, BackendType::Capture);
-        return al::to_underlying(supported);
-    }
-    WARN("Invalid device type: {:#04x}", as_unsigned(deviceType));
-    al::Device::SetGlobalError(ALC_INVALID_ENUM);
-    return ALC_FALSE;
-}
-DefineAlcAlias(alcEventIsSupportedSOFT)
