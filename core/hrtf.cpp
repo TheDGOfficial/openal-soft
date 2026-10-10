@@ -39,12 +39,14 @@
 import filesystem;
 import format;
 import logging;
+import spanstream;
 import types;
 #else
 #include "alformat.hpp"
 #include "alformattypes.hpp"
 #include "filesystem.h"
 #include "logging.h"
+#include "spanstream.hpp"
 #endif
 
 
@@ -64,105 +66,16 @@ struct HrtfEntry {
     NOINLINE ~HrtfEntry() = default;
 };
 
-struct LoadedHrtf {
-    std::string mFilename;
-    unsigned mSampleRate{};
-    std::unique_ptr<HrtfStore> mEntry;
-
-    template<typename T, typename U>
-    LoadedHrtf(T&& name, unsigned const srate, U&& entry)
-        : mFilename{std::forward<T>(name)}, mSampleRate{srate}, mEntry{std::forward<U>(entry)}
-    { }
-    LoadedHrtf(LoadedHrtf&&) = default;
-    /* GCC warns when it tries to inline this. */
-    NOINLINE ~LoadedHrtf() = default;
-
-    LoadedHrtf& operator=(LoadedHrtf&&) = default;
-};
-
 
 /* First value for pass-through coefficients (remaining are 0), used for omni-
  * directional sounds. */
 constexpr auto PassthruCoeff = gsl::narrow_cast<float>(1.0/std::numbers::sqrt2);
 
 auto LoadedHrtfLock = std::mutex{};
-auto LoadedHrtfs = std::vector<LoadedHrtf>{};
+auto LoadedHrtfs = std::vector<std::unique_ptr<HrtfStore>>{};
 
 auto EnumeratedHrtfLock = std::mutex{};
 auto EnumeratedHrtfs = std::vector<HrtfEntry>{};
-
-
-/* NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
- * To access a memory buffer through the std::istream interface, a custom
- * std::streambuf implementation is needed that has to do pointer manipulation
- * for seeking. With C++23, we may be able to use std::spanstream instead.
- */
-class databuf final : public std::streambuf {
-protected:
-    auto underflow() -> int_type final { return traits_type::eof(); }
-
-    auto seekoff(off_type const offset, std::ios_base::seekdir const whence,
-        std::ios_base::openmode const mode) -> pos_type final
-    {
-        if((mode&std::ios_base::out) || !(mode&std::ios_base::in))
-            return traits_type::eof();
-
-        switch(whence)
-        {
-        case std::ios_base::beg:
-            if(offset < 0 || offset > egptr()-eback())
-                return traits_type::eof();
-            setg(eback(), eback()+offset, egptr());
-            break;
-
-        case std::ios_base::cur:
-            if((offset >= 0 && offset > egptr()-gptr()) ||
-                (offset < 0 && -offset > gptr()-eback()))
-                return traits_type::eof();
-            setg(eback(), gptr()+offset, egptr());
-            break;
-
-        case std::ios_base::end:
-            if(offset > 0 || -offset > egptr()-eback())
-                return traits_type::eof();
-            setg(eback(), egptr()+offset, egptr());
-            break;
-
-        default:
-            return traits_type::eof();
-        }
-
-        return gptr() - eback();
-    }
-
-    auto seekpos(pos_type const pos, std::ios_base::openmode const mode) -> pos_type final
-    {
-        // Simplified version of seekoff
-        if((mode&std::ios_base::out) || !(mode&std::ios_base::in))
-            return traits_type::eof();
-
-        if(pos < 0 || pos > egptr()-eback())
-            return traits_type::eof();
-
-        setg(eback(), eback()+gsl::narrow_cast<std::size_t>(pos), egptr());
-        return pos;
-    }
-
-public:
-    explicit databuf(std::span<char_type> const data) noexcept
-    {
-        setg(data.data(), data.data(), std::to_address(data.end()));
-    }
-};
-/* NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic) */
-
-class idstream final : public std::istream {
-    databuf mStreamBuf;
-
-public:
-    explicit idstream(const std::span<char_type> data) : std::istream{nullptr}, mStreamBuf{data}
-    { init(&mStreamBuf); }
-};
 
 
 struct IdxBlend { unsigned idx; float blend; };
@@ -490,36 +403,40 @@ try {
 
     auto const loadlock = std::lock_guard{LoadedHrtfLock};
     auto handle = std::lower_bound(LoadedHrtfs.begin(), LoadedHrtfs.end(), fname,
-        [devrate](LoadedHrtf const &hrtf, std::string_view const filename) -> bool
+        [devrate](std::unique_ptr<HrtfStore> &hrtf, std::string_view const filename) -> bool
     {
-        return hrtf.mSampleRate < devrate
-            || (hrtf.mSampleRate == devrate && hrtf.mFilename < filename);
+        return hrtf->mSampleRate < devrate
+            || (hrtf->mSampleRate == devrate && hrtf->mFilename < filename);
     });
-    if(handle != LoadedHrtfs.end() && handle->mSampleRate == devrate && handle->mFilename == fname)
+    if(handle != LoadedHrtfs.end() && (*handle)->mSampleRate == devrate
+        && (*handle)->mFilename == fname)
     {
-        if(auto *hrtf = handle->mEntry.get())
-        {
-            Expects(hrtf->mSampleRate == devrate);
-            hrtf->inc_ref();
-            return HrtfStorePtr{hrtf};
-        }
+        (*handle)->inc_ref();
+        return HrtfStorePtr{std::to_address(*handle)};
     }
 
-    auto stream = std::unique_ptr<std::istream>{};
-    auto residx = int{};
-    auto ch = char{};
-    /* NOLINTNEXTLINE(cert-err34-c,cppcoreguidelines-pro-type-vararg) */
-    if(sscanf(fname.c_str(), "!%d%c", &residx, &ch) == 2 && ch == '_')
+    auto builtin_name = [](al::ispanstream stream) -> std::optional<int>
     {
-        TRACE("Loading built-in HRTF {}...", residx);
-        auto const res = GetHrtfResource(residx);
+        if(stream.get() != '!')
+            return std::nullopt;
+        auto residx = int{};
+        if((stream >> residx).get() != '_')
+            return std::nullopt;
+        return residx;
+    };
+    auto stream = std::unique_ptr<std::istream>{};
+    if(auto residx = builtin_name(al::ispanstream{fname}); residx.has_value())
+    {
+        TRACE("Loading built-in HRTF {}...", *residx);
+        auto const res = GetHrtfResource(*residx);
         if(res.empty())
         {
-            ERR("Could not get resource {}, {}", residx, name);
+            ERR("Could not get resource {}, {}", *residx, name);
             return nullptr;
         }
-        /* NOLINTNEXTLINE(*-const-cast) */
-        stream = std::make_unique<idstream>(std::span{const_cast<char*>(res.data()), res.size()});
+        auto spstream = std::make_unique<al::ispanstream>(std::span<char>{}, std::ios::binary);
+        spstream->span(res);
+        stream = std::move(spstream);
     }
     else
     {
@@ -608,11 +525,11 @@ try {
         hrtf->mSampleRate = devrate & 0xff'ff'ff;
     }
 
-    handle = LoadedHrtfs.emplace(handle, fname, devrate, std::move(hrtf));
+    handle = LoadedHrtfs.emplace(handle, std::move(hrtf));
     TRACE("Loaded HRTF {} for sample rate {}hz, {}-sample filter", name,
-        unsigned{handle->mEntry->mSampleRate}, unsigned{handle->mEntry->mIrSize});
+        unsigned{(*handle)->mSampleRate}, unsigned{(*handle)->mIrSize});
 
-    return HrtfStorePtr{handle->mEntry.get()};
+    return HrtfStorePtr{std::to_address(*handle)};
 }
 catch(std::exception& e) {
     ERR("Failed to load {}: {}", name, e.what());
@@ -635,16 +552,15 @@ void HrtfStore::dec_ref() noexcept
         auto const loadlock = std::lock_guard{LoadedHrtfLock};
 
         /* Go through and remove all unused HRTFs. */
-        auto iter = std::ranges::remove_if(LoadedHrtfs, [](LoadedHrtf &hrtf) -> bool
+        auto unused = std::ranges::remove_if(LoadedHrtfs, [](HrtfStore &hrtf) -> bool
         {
-            if(auto const *const entry = hrtf.mEntry.get(); entry && entry->mRef.load() == 0)
+            if(hrtf.mRef.load() == 0)
             {
                 TRACE("Unloading unused HRTF {}", hrtf.mFilename);
-                hrtf.mEntry = nullptr;
                 return true;
             }
             return false;
-        });
-        LoadedHrtfs.erase(iter.begin(), iter.end());
+        }, al::dereference{});
+        LoadedHrtfs.erase(unused.begin(), unused.end());
     }
 }
