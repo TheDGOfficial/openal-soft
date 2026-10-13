@@ -46,8 +46,6 @@
 
 #include "alc/alconfig.h"
 #include "alnumeric.h"
-#include "alstring.h"
-#include "core/helpers.h"
 #include "dlopennote.h"
 #include "dynload.h"
 #include "opthelpers.h"
@@ -130,8 +128,10 @@ constexpr auto PwIdAny = PW_ID_ANY;
 DIAGNOSTIC_POP;
 
 #if HAVE_CXXMODULES
+import alstring;
 import backends.exception;
 import core.device;
+import core.helpers;
 import fmtlib;
 import format;
 import gsl;
@@ -144,7 +144,9 @@ import zstring_view;
 #include "alformat.hpp"
 #include "alformattypes.hpp"
 #include "alformatzsv.hpp"
+#include "alstring.h"
 #include "core/device.h"
+#include "core/helpers.hpp"
 #include "core/logging.h"
 #include "fmt/format.h"
 #include "fmt/ranges.h"

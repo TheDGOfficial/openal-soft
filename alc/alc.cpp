@@ -76,7 +76,6 @@
 #include "alc/events.h"
 #include "alconfig.h"
 #include "alnumeric.h"
-#include "alstring.h"
 #include "alu.h"
 #include "atomic.h"
 #include "core/ambidefs.h"
@@ -89,7 +88,6 @@
 #include "core/filters/nfc.h"
 #include "core/fpu_ctrl.h"
 #include "core/front_stablizer.h"
-#include "core/helpers.h"
 #include "core/hrtf.h"
 #include "core/mastering.h"
 #include "core/tsmefilter.hpp"
@@ -169,7 +167,9 @@
 #if HAVE_CXXMODULES
 import alc.context;
 import alc.device;
+import alstring;
 import backends.exception;
+import core.helpers;
 import fmtlib;
 import format;
 import logging;
@@ -180,6 +180,8 @@ import types;
 #include "alc/device.h"
 #include "alformat.hpp"
 #include "alformattypes.hpp"
+#include "alstring.h"
+#include "core/helpers.hpp"
 #include "core/logging.h"
 #include "fmt/format.h"
 #include "fmt/ranges.h"
