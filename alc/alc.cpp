@@ -1081,18 +1081,19 @@ constexpr auto X71Downmix = std::array{
 };
 
 
-auto CreateDeviceLimiter(al::Device const& device, f32 const threshold)
+auto CreateDeviceLimiter(al::Device const& device, float const threshold)
     -> std::unique_ptr<Compressor>
 {
     constexpr auto flags = Compressor::FlagBits{}.set(Compressor::Flags::AutoKnee)
         .set(Compressor::Flags::AutoAttack).set(Compressor::Flags::AutoRelease)
         .set(Compressor::Flags::AutoPostGain).set(Compressor::Flags::AutoDeclip);
 
-    return Compressor::Create({.NumChans = usize{device.RealOut.Buffer.size()}.cast_to<u32>(),
-        .SampleRate = sys_uint{device.mSampleRate}.cast_to<f32>(), .AutoFlags = flags,
-        .LookAheadTime = 0.001_f32, .HoldTime = 0.002_f32, .PreGainDb = 0.0_f32,
-        .PostGainDb = 0.0_f32, .ThresholdDb = threshold, .Ratio = f32::infinity(),
-        .KneeDb = 0.0_f32, .AttackTime = 0.02_f32, .ReleaseTime = 0.2_f32});
+    return Compressor::Create({
+        .NumChans = gsl::narrow<std::uint32_t>(device.RealOut.Buffer.size()),
+        .SampleRate = gsl::narrow_cast<float>(device.mSampleRate), .AutoFlags = flags,
+        .LookAheadTime = 0.001f, .HoldTime = 0.002f, .PreGainDb = 0.0f,
+        .PostGainDb = 0.0f, .ThresholdDb = threshold, .Ratio = f32::infinity().c_val,
+        .KneeDb = 0.0f, .AttackTime = 0.02f, .ReleaseTime = 0.2f});
 }
 
 /**
@@ -1343,11 +1344,11 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
                 break;
 
             case ATTRIBUTE(ALC_MONO_SOURCES)
-                numMono = al::saturate_cast<ALCuint>(attrvalue);
+                numMono = al::saturating_cast<ALCuint>(attrvalue);
                 break;
 
             case ATTRIBUTE(ALC_STEREO_SOURCES)
-                numStereo = al::saturate_cast<ALCuint>(attrvalue);
+                numStereo = al::saturating_cast<ALCuint>(attrvalue);
                 break;
 
             case ATTRIBUTE(ALC_MAX_AUXILIARY_SENDS)
@@ -1764,7 +1765,7 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
         TRACE("Output limiter disabled");
     else
     {
-        auto thrshld = 1.0_f32;
+        auto thrshld = 1.0f;
         switch(device.FmtType)
         {
         case DevFmtByte:
@@ -1783,7 +1784,7 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
         if(device.DitherDepth > 0.0f)
             thrshld -= 1.0f / device.DitherDepth;
 
-        const auto thrshld_dB = log10(thrshld) * 20.0f;
+        const auto thrshld_dB = std::log10(thrshld) * 20.0f;
         auto limiter = CreateDeviceLimiter(device, thrshld_dB);
 
         sample_delay += limiter->getLookAhead();
@@ -2324,7 +2325,7 @@ auto GetIntegerv(al::Device *const device, ALCenum const param, std::span<ALCint
             return 1;
 
         case ALC_CAPTURE_SAMPLES:
-            values[0] = al::saturate_cast<ALCint>(device->Backend->availableSamples());
+            values[0] = al::saturating_cast<ALCint>(device->Backend->availableSamples());
             return 1;
 
         case ALC_CONNECTED:
@@ -2537,7 +2538,7 @@ auto GetIntegerv(al::Device *const device, ALCenum const param, std::span<ALCint
 
     case ALC_NUM_HRTF_SPECIFIERS_SOFT:
         device->enumerateHrtfs();
-        values[0] = al::saturate_cast<ALCint>(device->mHrtfList.size());
+        values[0] = al::saturating_cast<ALCint>(device->mHrtfList.size());
         return 1;
 
     case ALC_OUTPUT_LIMITER_SOFT:
