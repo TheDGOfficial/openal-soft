@@ -26,8 +26,19 @@
 
 namespace al {
 
+namespace detail {
+    template<typename T>
+    concept integral = std::integral<T>
+        and not std::same_as<T, bool>
+        and not std::same_as<T, char>
+        and not std::same_as<T, wchar_t>
+        and not std::same_as<T, char8_t>
+        and not std::same_as<T, char16_t>
+        and not std::same_as<T, char32_t>;
+}
+
 #if HAS_BUILTIN(__builtin_add_overflow)
-template<std::integral T> [[nodiscard]] constexpr
+template<detail::integral T> [[nodiscard]] constexpr
 auto saturating_add(T const lhs, T const rhs) noexcept -> T
 {
     T res;
@@ -43,7 +54,7 @@ auto saturating_add(T const lhs, T const rhs) noexcept -> T
 
 #else
 
-template<std::integral T> [[nodiscard]]
+template<detail::integral T> [[nodiscard]]
 constexpr auto saturating_add(T const lhs, T const rhs) noexcept -> T
 {
     if constexpr(std::is_signed_v<T>)
@@ -71,7 +82,7 @@ constexpr auto saturating_add(T const lhs, T const rhs) noexcept -> T
 namespace detail {
 
     template<typename T>
-    concept number = std::integral<T> or std::floating_point<T>;
+    concept number = integral<T> or std::floating_point<T>;
 
     template<std::floating_point T> [[nodiscard]] constexpr
     auto unsigned_from_fp(T const& val) noexcept
@@ -103,13 +114,38 @@ auto saturating_cast(T const val) noexcept -> R
     {
         if constexpr(std::integral<R>) /* fp -> integer */
         {
+            /* mantbits is the number of mantissa bits physically stored in the
+             * variable. 32- and 64-bit fp formats (float and double) have an
+             * implied 1 bit that is included in the digits count but not
+             * actually stored.
+             * TODO: The 80-bit extended precision format (long double in GCC,
+             * Clang, etc.) makes the extra 1 bit explicit in the mantissa.
+             */
             auto constexpr mantbits = unsigned{std::numeric_limits<T>::digits - 1};
             auto constexpr max_exponent = unsigned{std::numeric_limits<T>::max_exponent};
             auto constexpr expbits = unsigned{std::bit_width(max_exponent)};
-            auto constexpr minexp = unsigned{(1<<(expbits-1)) - 1};
-            auto constexpr expoffset = unsigned{minexp + mantbits};
-            auto constexpr maxexp = unsigned{std::numeric_limits<R>::digits + minexp - 1};
+            /* expbias is the exponent value that encodes for 1.xxxx. This
+             * corresponds to a left-shift of 1-fpdigits (or a right-shift of
+             * fpdigits-1) for the mantissa bits. This is also the minimum
+             * viable exponent, as anything less will shift the mantissa to 0.
+             */
+            auto constexpr expbias = unsigned{(1<<(expbits-1)) - 1};
+            /* expoffset is the exponent value that results in no shift to the
+             * mantissa bits.
+             */
+            auto constexpr expoffset = unsigned{int{expbias} + std::numeric_limits<T>::digits - 1};
+            /* expmax is the maximum viable exponent value. Anything greater
+             * will overflow (for positive values), or either underflow or
+             * result in exactly the integer minimum (for negative values).
+             */
+            auto constexpr expmax = unsigned{std::numeric_limits<R>::digits
+                - std::numeric_limits<T>::digits + int{expoffset}};
 
+            /* Values for extracting and building the result. The type needs to
+             * be large enough to handle the fp value as an integer and the
+             * result type (unsigned int is included to avoid automatic type
+             * promotions).
+             */
             using tmpint_t = std::common_type_t<unsigned, std::make_unsigned_t<R>,
                 decltype(detail::unsigned_from_fp(val))>;
             auto constexpr expmask = ((tmpint_t{1}<<expbits) - 1) << mantbits;
@@ -118,33 +154,43 @@ auto saturating_cast(T const val) noexcept -> R
             auto constexpr mantissamask = tmpint_t{impliedbit - 1};
 
             auto const conv_u = detail::unsigned_from_fp(val);
-            auto const expbase = (conv_u&expmask) >> mantbits;
-            if(expbase < minexp) [[unlikely]]
+            auto const exponent = (conv_u&expmask) >> mantbits;
+            if(exponent < expbias)
                 return R{0};
 
             if constexpr(std::signed_integral<R>) /* fp -> signed integer */
             {
-                if(expbase > maxexp) [[unlikely]]
+                if(exponent > expmax) [[unlikely]]
+                {
+                    /* Convert NaN to 0. */
+                    if(exponent == (expmask>>mantbits) and (conv_u&mantissamask) != 0)
+                        return R{0};
                     return (conv_u&signmask) ? std::numeric_limits<R>::min()
                         : std::numeric_limits<R>::max();
+                }
 
                 auto const sign = (conv_u&signmask) ? R{-1} : R{1};
                 auto const mant = tmpint_t{(conv_u&mantissamask) | impliedbit};
-                if(expbase < expoffset) [[likely]]
-                    return static_cast<R>(static_cast<R>(mant >> (expoffset-expbase)) * sign);
-                return static_cast<R>(static_cast<R>(mant << (expbase-expoffset)) * sign);
+                if(exponent < expoffset) [[likely]]
+                    return static_cast<R>(static_cast<R>(mant >> (expoffset-exponent)) * sign);
+                return static_cast<R>(static_cast<R>(mant << (exponent-expoffset)) * sign);
             }
             else if constexpr(std::unsigned_integral<R>) /* fp -> unsigned integer */
             {
-                if(expbase > maxexp) [[unlikely]]
+                if(exponent > expmax) [[unlikely]]
+                {
+                    /* Convert NaN to 0. */
+                    if(exponent == (expmask>>mantbits) and (conv_u&mantissamask) != 0)
+                        return R{0};
                     return (conv_u&signmask) ? R{0} : std::numeric_limits<R>::max();
+                }
 
                 /* A 0 mask for negative values creates a 0 result. */
                 auto const mask = (conv_u&signmask) ? R{0} : std::numeric_limits<R>::max();
                 auto const mant = tmpint_t{(conv_u&mantissamask) | impliedbit};
-                if(expbase < expoffset) [[likely]]
-                    return static_cast<R>((mant >> (expoffset-expbase)) & mask);
-                return static_cast<R>((mant << (expbase-expoffset)) & mask);
+                if(exponent < expoffset) [[likely]]
+                    return static_cast<R>((mant >> (expoffset-exponent)) & mask);
+                return static_cast<R>((mant << (exponent-expoffset)) & mask);
             }
             else
             {
@@ -272,7 +318,7 @@ auto fastf2u(float const f) noexcept -> unsigned
 { return static_cast<unsigned>(fastf2i(f)); }
 
 
-namespace detail_ {
+namespace detail {
 
 /* Integral limit, where sub-integral precision is not available for floats. */
 inline constexpr auto ilim = std::array{
@@ -327,10 +373,10 @@ auto fast_roundf(float f) noexcept -> float
      * may break without __builtin_assoc_barrier support).
      */
 #if HAS_BUILTIN(__builtin_assoc_barrier)
-    return __builtin_assoc_barrier(f + detail_::ilim[sign]) - detail_::ilim[sign];
+    return __builtin_assoc_barrier(f + detail::ilim[sign]) - detail::ilim[sign];
 #else
-    f += detail_::ilim[sign];
-    return f - detail_::ilim[sign];
+    f += detail::ilim[sign];
+    return f - detail::ilim[sign];
 #endif
 #endif
 }
