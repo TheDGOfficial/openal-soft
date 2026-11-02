@@ -1,5 +1,5 @@
-#ifndef AL_NUMERIC_H
-#define AL_NUMERIC_H
+#ifndef COMMON_NUMERIC_HPP
+#define COMMON_NUMERIC_HPP
 
 #include "config_simd.h"
 
@@ -9,7 +9,9 @@
 #include <cmath>
 #include <concepts>
 #include <cstddef>
+#include <cstdint>
 #include <limits>
+#include <numeric>
 #include <string_view>
 #include <type_traits>
 #ifdef HAVE_INTRIN_H
@@ -66,36 +68,134 @@ constexpr auto saturating_add(T const lhs, T const rhs) noexcept -> T
 }
 #endif
 
-template<std::integral R, std::integral T> [[nodiscard]] constexpr
-auto saturating_cast(T val) noexcept -> R
-{
-    if constexpr(std::numeric_limits<R>::digits < std::numeric_limits<T>::digits)
+namespace detail {
+
+    template<typename T>
+    concept number = std::integral<T> or std::floating_point<T>;
+
+    template<std::floating_point T> [[nodiscard]] constexpr
+    auto unsigned_from_fp(T const& val) noexcept
     {
-        if constexpr(std::signed_integral<R> && std::signed_integral<T>)
+        if constexpr(sizeof(T) == sizeof(std::uint32_t))
+            return std::bit_cast<std::uint32_t>(val);
+        else if constexpr(sizeof(T) == sizeof(std::uint64_t))
+            return std::bit_cast<std::uint64_t>(val);
+        else if constexpr(sizeof(T) == sizeof(std::uint16_t))
+            return std::bit_cast<std::uint16_t>(val);
+        else if constexpr(sizeof(T) == sizeof(std::uint8_t))
+            return std::bit_cast<std::uint8_t>(val);
+        else
         {
-            if(val < std::numeric_limits<R>::min())
-                return std::numeric_limits<R>::min();
+            static_assert(al::dependent_false<T>, "Unexpected floating point type");
+            return 0u;
         }
-        if(val > T{std::numeric_limits<R>::max()})
-            return std::numeric_limits<R>::max();
     }
-    if constexpr(std::unsigned_integral<R> && std::signed_integral<T>)
+
+}
+
+/* Our saturating_cast supports floating point (currently requires radix == 2,
+ * and doesn't support larger than 64-bit types).
+ */
+template<detail::number R, detail::number T> [[nodiscard]] constexpr
+auto saturating_cast(T const val) noexcept -> R
+{
+    if constexpr(std::floating_point<T>)
     {
-        if(val < 0)
-            return R{0};
+        if constexpr(std::integral<R>) /* fp -> integer */
+        {
+            auto constexpr mantbits = unsigned{std::numeric_limits<T>::digits - 1};
+            auto constexpr max_exponent = unsigned{std::numeric_limits<T>::max_exponent};
+            auto constexpr expbits = unsigned{std::bit_width(max_exponent)};
+            auto constexpr minexp = unsigned{(1<<(expbits-1)) - 1};
+            auto constexpr expoffset = unsigned{minexp + mantbits};
+            auto constexpr maxexp = unsigned{std::numeric_limits<R>::digits + minexp - 1};
+
+            using tmpint_t = std::common_type_t<unsigned, std::make_unsigned_t<R>,
+                decltype(detail::unsigned_from_fp(val))>;
+            auto constexpr expmask = ((tmpint_t{1}<<expbits) - 1) << mantbits;
+            auto constexpr signmask = tmpint_t{1} << (mantbits+expbits);
+            auto constexpr impliedbit = tmpint_t{1} << mantbits;
+            auto constexpr mantissamask = tmpint_t{impliedbit - 1};
+
+            auto const conv_u = detail::unsigned_from_fp(val);
+            auto const expbase = (conv_u&expmask) >> mantbits;
+            if(expbase < minexp) [[unlikely]]
+                return R{0};
+
+            if constexpr(std::signed_integral<R>) /* fp -> signed integer */
+            {
+                if(expbase > maxexp) [[unlikely]]
+                    return (conv_u&signmask) ? std::numeric_limits<R>::min()
+                        : std::numeric_limits<R>::max();
+
+                auto const sign = (conv_u&signmask) ? R{-1} : R{1};
+                auto const mant = tmpint_t{(conv_u&mantissamask) | impliedbit};
+                if(expbase < expoffset) [[likely]]
+                    return static_cast<R>(static_cast<R>(mant >> (expoffset-expbase)) * sign);
+                return static_cast<R>(static_cast<R>(mant << (expbase-expoffset)) * sign);
+            }
+            else if constexpr(std::unsigned_integral<R>) /* fp -> unsigned integer */
+            {
+                if(expbase > maxexp) [[unlikely]]
+                    return (conv_u&signmask) ? R{0} : std::numeric_limits<R>::max();
+
+                /* A 0 mask for negative values creates a 0 result. */
+                auto const mask = (conv_u&signmask) ? R{0} : std::numeric_limits<R>::max();
+                auto const mant = tmpint_t{(conv_u&mantissamask) | impliedbit};
+                if(expbase < expoffset) [[likely]]
+                    return static_cast<R>((mant >> (expoffset-expbase)) & mask);
+                return static_cast<R>((mant << (expbase-expoffset)) & mask);
+            }
+            else
+            {
+                static_assert(al::dependent_false<R>, "Unexpected numeric type conversion");
+                return R{};
+            }
+        }
+        else
+        {
+            /* fp -> fp automatically saturates. */
+            static_assert(std::floating_point<R>, "Unexpected numeric type conversion");
+            return static_cast<R>(val);
+        }
     }
-    return static_cast<R>(val);
+    else if constexpr(std::integral<R>) /* integer -> integer */
+    {
+        if constexpr(std::numeric_limits<R>::digits < std::numeric_limits<T>::digits)
+        {
+            if constexpr(std::signed_integral<R> && std::signed_integral<T>)
+            {
+                if(val < std::numeric_limits<R>::min())
+                    return std::numeric_limits<R>::min();
+            }
+            if(val > T{std::numeric_limits<R>::max()})
+                return std::numeric_limits<R>::max();
+        }
+        if constexpr(std::unsigned_integral<R> && std::signed_integral<T>)
+        {
+            if(val < 0)
+                return R{0};
+        }
+        return static_cast<R>(val);
+    }
+    else
+    {
+        /* integer -> fp automatically saturates. */
+        static_assert(std::integral<T> and std::floating_point<R>,
+            "Unexpected numeric type conversion");
+        return static_cast<R>(val);
+    }
 }
 
 } /* namespace al */
 
 
 template<std::integral T> [[nodiscard]] constexpr
-auto as_unsigned(T value) noexcept
+auto as_unsigned(T const value) noexcept
 { return static_cast<std::make_unsigned_t<T>>(value); }
 
 template<std::integral T> [[nodiscard]] constexpr
-auto as_signed(T value) noexcept
+auto as_signed(T const value) noexcept
 { return static_cast<std::make_signed_t<T>>(value); }
 
 
@@ -170,57 +270,6 @@ auto fastf2i(float const f) noexcept -> int
 [[nodiscard]] inline
 auto fastf2u(float const f) noexcept -> unsigned
 { return static_cast<unsigned>(fastf2i(f)); }
-
-/**
- * Converts float-to-int using standard behavior (truncation). Out of range
- * values are clamped.
- */
-[[nodiscard]] constexpr
-auto float2int(float const f) noexcept -> int
-{
-    /* We can't rely on SSE or the compiler generated conversion if we want
-     * clamping behavior with overflow and underflow.
-     */
-    const auto conv_i = std::bit_cast<int>(f);
-
-    const auto sign = (conv_i>>31) | 1;
-    const auto shift = ((conv_i>>23)&0xff) - (127+23);
-
-    /* Too small. */
-    if(shift < -23) [[unlikely]]
-        return 0;
-    /* Too large (or NaN). */
-    if(shift > 7) [[unlikely]]
-        return (sign > 0) ? std::numeric_limits<int>::max() : std::numeric_limits<int>::min();
-
-    const auto mant = (conv_i&0x7f'ff'ff) | 0x80'00'00;
-    if(shift < 0) [[likely]]
-        return (mant >> -shift) * sign;
-    return (mant << shift) * sign;
-}
-/**
- * Converts float-to-uint using standard behavior (truncation). Out of range
- * values are clamped.
- */
-[[nodiscard]] constexpr
-auto float2uint(float const f) noexcept -> unsigned
-{
-    const auto conv_i = std::bit_cast<int>(f);
-
-    /* A 0 mask for negative values creates a 0 result. */
-    const auto mask = static_cast<unsigned>(conv_i>>31) ^ 0xff'ff'ff'ffu;
-    const auto shift = ((conv_i>>23)&0xff) - (127+23);
-
-    if(shift < -23) [[unlikely]]
-        return 0;
-    if(shift > 8) [[unlikely]]
-        return std::numeric_limits<unsigned>::max() & mask;
-
-    const auto mant = static_cast<unsigned>(conv_i&0x7f'ff'ff) | 0x80'00'00u;
-    if(shift < 0) [[likely]]
-        return (mant >> -shift) & mask;
-    return (mant << shift) & mask;
-}
 
 
 namespace detail_ {
@@ -305,4 +354,4 @@ auto gain_to_level_mb(float const x) -> float
     return std::max(std::log10(x) * 2'000.0f, -10'000.0f);
 }
 
-#endif /* AL_NUMERIC_H */
+#endif /* COMMON_NUMERIC_HPP */

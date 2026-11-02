@@ -75,7 +75,6 @@
 #include "al/source.h"
 #include "alc/events.h"
 #include "alconfig.h"
-#include "alnumeric.h"
 #include "alu.h"
 #include "atomic.h"
 #include "core/ambidefs.h"
@@ -173,6 +172,7 @@ import core.helpers;
 import fmtlib;
 import format;
 import logging;
+import numeric;
 import types;
 #else
 #include "alc/backends/exception.hpp"
@@ -185,6 +185,7 @@ import types;
 #include "core/logging.h"
 #include "fmt/format.h"
 #include "fmt/ranges.h"
+#include "numeric.hpp"
 #endif
 
 
@@ -1736,7 +1737,7 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
         TRACE("Dithering disabled");
     else
         TRACE("Dithering enabled ({}-bit, {:g})",
-            float2int(std::log2(device.DitherDepth)+0.5f)+1, device.DitherDepth);
+            al::saturating_cast<int>(std::log2(device.DitherDepth)+0.5f)+1, device.DitherDepth);
 
     if(!optlimit)
         optlimit = device.configValue<bool>({}, "output-limiter");
