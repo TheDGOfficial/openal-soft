@@ -39,6 +39,7 @@
 #include <cmath>
 #include <csignal>
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -180,13 +181,11 @@ import fmtlib;
 import format;
 import logging;
 import numeric;
-import types;
 #else
 #include "alc/backends/exception.hpp"
 #include "alc/context.hpp"
 #include "alc/device.h"
 #include "alformat.hpp"
-#include "alformattypes.hpp"
 #include "alstring.h"
 #include "core/helpers.hpp"
 #include "core/logging.h"
@@ -460,7 +459,7 @@ void alc_initconfig()
 
     if(auto const suspendmode = al::getenv("__ALSOFT_SUSPEND_CONTEXT"))
     {
-        if(is_eq(al::ci_compare(*suspendmode, "ignore"sv)))
+        if(al::ci_equal(*suspendmode, "ignore"sv))
         {
             SuspendDefers = false;
             TRACE("Selected context suspend behavior, \"ignore\"");
@@ -484,8 +483,7 @@ void alc_initconfig()
 #endif
     if(auto cpuopt = ConfigValueStr({}, {}, "disable-cpu-exts"sv))
     {
-        if(auto const cpulist = std::string_view{*cpuopt};
-            is_eq(al::ci_compare(cpulist, "all"sv)))
+        if(auto const cpulist = std::string_view{*cpuopt}; al::ci_equal(cpulist, "all"sv))
             capfilter.reset();
         else
         {
@@ -500,15 +498,15 @@ void alc_initconfig()
                 if(entry.empty())
                     return;
 
-                if(is_eq(al::ci_compare(entry, "sse"sv)))
+                if(al::ci_equal(entry, "sse"sv))
                     capfilter.reset(CPUCap::SSE);
-                else if(is_eq(al::ci_compare(entry, "sse2"sv)))
+                else if(al::ci_equal(entry, "sse2"sv))
                     capfilter.reset(CPUCap::SSE2);
-                else if(is_eq(al::ci_compare(entry, "sse3"sv)))
+                else if(al::ci_equal(entry, "sse3"sv))
                     capfilter.reset(CPUCap::SSE3);
-                else if(is_eq(al::ci_compare(entry, "sse4.1"sv)))
+                else if(al::ci_equal(entry, "sse4.1"sv))
                     capfilter.reset(CPUCap::SSE4_1);
-                else if(is_eq(al::ci_compare(entry, "neon"sv)))
+                else if(al::ci_equal(entry, "neon"sv))
                     capfilter.reset(CPUCap::NEON);
                 else
                     WARN("Invalid CPU extension \"{}\"", entry);
@@ -550,7 +548,7 @@ void alc_initconfig()
         {
             if(auto const optval = al::getenv(envname))
             {
-                return is_eq(al::ci_compare(*optval, "true"sv))
+                return al::ci_equal(*optval, "true"sv)
                     or strtol(optval->c_str(), nullptr, 0) == 1;
             }
             return GetConfigValueBool({}, "game_compat", optname, false);
@@ -566,22 +564,22 @@ void alc_initconfig()
 
     if(auto uhjfiltopt = ConfigValueStr({}, "uhj"sv, "decode-filter"sv))
     {
-        if(is_eq(al::ci_compare(*uhjfiltopt, "fir256"sv)))
+        if(al::ci_equal(*uhjfiltopt, "fir256"sv))
             UhjDecodeQuality = UhjQualityType::FIR256;
-        else if(is_eq(al::ci_compare(*uhjfiltopt, "fir512"sv)))
+        else if(al::ci_equal(*uhjfiltopt, "fir512"sv))
             UhjDecodeQuality = UhjQualityType::FIR512;
-        else if(is_eq(al::ci_compare(*uhjfiltopt, "iir"sv)))
+        else if(al::ci_equal(*uhjfiltopt, "iir"sv))
             UhjDecodeQuality = UhjQualityType::IIR;
         else
             WARN("Unsupported uhj/decode-filter: {}", *uhjfiltopt);
     }
     if(auto uhjfiltopt = ConfigValueStr({}, "uhj"sv, "encode-filter"sv))
     {
-        if(is_eq(al::ci_compare(*uhjfiltopt, "fir256"sv)))
+        if(al::ci_equal(*uhjfiltopt, "fir256"sv))
             UhjEncodeQuality = UhjQualityType::FIR256;
-        else if(is_eq(al::ci_compare(*uhjfiltopt, "fir512"sv)))
+        else if(al::ci_equal(*uhjfiltopt, "fir512"sv))
             UhjEncodeQuality = UhjQualityType::FIR512;
-        else if(is_eq(al::ci_compare(*uhjfiltopt, "iir"sv)))
+        else if(al::ci_equal(*uhjfiltopt, "iir"sv))
             UhjEncodeQuality = UhjQualityType::IIR;
         else
             WARN("Unsupported uhj/encode-filter: {}", *uhjfiltopt);
@@ -589,29 +587,29 @@ void alc_initconfig()
 
     if(auto tsmefiltopt = ConfigValueStr({}, "tsme"sv, "decode-filter"sv))
     {
-        if(is_eq(al::ci_compare(*tsmefiltopt, "fir256"sv)))
+        if(al::ci_equal(*tsmefiltopt, "fir256"sv))
             TsmeDecodeQuality = TsmeQualityType::FIR256;
-        else if(is_eq(al::ci_compare(*tsmefiltopt, "fir512"sv)))
+        else if(al::ci_equal(*tsmefiltopt, "fir512"sv))
             TsmeDecodeQuality = TsmeQualityType::FIR512;
-        else if(is_eq(al::ci_compare(*tsmefiltopt, "iir"sv)))
+        else if(al::ci_equal(*tsmefiltopt, "iir"sv))
             TsmeDecodeQuality = TsmeQualityType::IIR;
         else
             WARN("Unsupported tsme/decode-filter: {}", *tsmefiltopt);
     }
     if(auto tsmefiltopt = ConfigValueStr({}, "tsme"sv, "encode-filter"sv))
     {
-        if(is_eq(al::ci_compare(*tsmefiltopt, "fir256"sv)))
+        if(al::ci_equal(*tsmefiltopt, "fir256"sv))
             TsmeEncodeQuality = TsmeQualityType::FIR256;
-        else if(is_eq(al::ci_compare(*tsmefiltopt, "fir512"sv)))
+        else if(al::ci_equal(*tsmefiltopt, "fir512"sv))
             TsmeEncodeQuality = TsmeQualityType::FIR512;
-        else if(is_eq(al::ci_compare(*tsmefiltopt, "iir"sv)))
+        else if(al::ci_equal(*tsmefiltopt, "iir"sv))
             TsmeEncodeQuality = TsmeQualityType::IIR;
         else
             WARN("Unsupported tsme/encode-filter: {}", *tsmefiltopt);
     }
 
     if(auto traperr = al::getenv("ALSOFT_TRAP_ERROR"); traperr
-        and (is_eq(al::ci_compare(*traperr, "true"sv))
+        and (al::ci_equal(*traperr, "true"sv)
             or std::strtol(traperr->c_str(), nullptr, 0) == 1))
     {
         TrapALError  = true;
@@ -621,14 +619,14 @@ void alc_initconfig()
     {
         traperr = al::getenv("ALSOFT_TRAP_AL_ERROR");
         if(traperr)
-            TrapALError = is_eq(al::ci_compare(*traperr, "true"sv))
+            TrapALError = al::ci_equal(*traperr, "true"sv)
                 or strtol(traperr->c_str(), nullptr, 0) == 1;
         else
             TrapALError = GetConfigValueBool({}, {}, "trap-al-error"sv, false);
 
         traperr = al::getenv("ALSOFT_TRAP_ALC_ERROR");
         if(traperr)
-            al::Device::sTrapALCError = is_eq(al::ci_compare(*traperr, "true"sv))
+            al::Device::sTrapALCError = al::ci_equal(*traperr, "true"sv)
                 or strtol(traperr->c_str(), nullptr, 0) == 1;
         else
             al::Device::sTrapALCError = GetConfigValueBool({}, {}, "trap-alc-error"sv, false);
@@ -778,7 +776,7 @@ void alc_initconfig()
     {
         if(auto optval = al::getenv("ALSOFT_EAX_TRACE_COMMITS"))
         {
-            EaxTraceCommits = is_eq(al::ci_compare(*optval, "true"sv))
+            EaxTraceCommits = al::ci_equal(*optval, "true"sv)
                 or strtol(optval->c_str(), nullptr, 0) == 1;
         }
         else
@@ -1100,8 +1098,9 @@ auto CreateDeviceLimiter(al::Device const& device, float const threshold)
         .NumChans = gsl::narrow<std::uint32_t>(device.RealOut.Buffer.size()),
         .SampleRate = gsl::narrow_cast<float>(device.mSampleRate), .AutoFlags = flags,
         .LookAheadTime = 0.001f, .HoldTime = 0.002f, .PreGainDb = 0.0f,
-        .PostGainDb = 0.0f, .ThresholdDb = threshold, .Ratio = f32::infinity().c_val,
-        .KneeDb = 0.0f, .AttackTime = 0.02f, .ReleaseTime = 0.2f});
+        .PostGainDb = 0.0f, .ThresholdDb = threshold,
+        .Ratio = std::numeric_limits<float>::infinity(), .KneeDb = 0.0f, .AttackTime = 0.02f,
+        .ReleaseTime = 0.2f});
 }
 
 /**
@@ -1196,46 +1195,46 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
 
             const auto iter = std::ranges::find_if(typelist,
                 [svfmt=std::string_view{*typeopt}](TypeMap const &entry) -> bool
-                { return is_eq(al::ci_compare(entry.name, svfmt)); });
+                { return al::ci_equal(entry.name, svfmt); });
             if(iter == typelist.end())
                 ERR("Unsupported sample-type: {}", *typeopt);
             else
                 opttype = iter->type;
         }
         if(auto const chanopt = device.configValue<std::string>({}, "channels"); chanopt
-            and is_neq(al::ci_compare(*chanopt, "surround3d71"sv)))
+            and al::ci_nequal(*chanopt, "surround3d71"sv))
         {
             struct ChannelMap {
                 std::string_view name;
                 DevFmtChannels chans;
-                u8 order;
+                std::uint8_t order;
             };
             constexpr auto chanlist = std::array{
-                ChannelMap{"mono"sv,       DevFmtMono,   0_u8},
-                ChannelMap{"stereo"sv,     DevFmtStereo, 0_u8},
-                ChannelMap{"quad"sv,       DevFmtQuad,   0_u8},
-                ChannelMap{"surround51"sv, DevFmtX51,    0_u8},
-                ChannelMap{"surround61"sv, DevFmtX61,    0_u8},
-                ChannelMap{"surround71"sv, DevFmtX71,    0_u8},
-                ChannelMap{"3d71"sv,         DevFmtX3D71, 0_u8},
-                ChannelMap{"surround714"sv,  DevFmtX714,  0_u8},
-                ChannelMap{"surround7144"sv, DevFmtX7144, 0_u8},
-                ChannelMap{"ambi1"sv, DevFmtAmbi3D, 1_u8},
-                ChannelMap{"ambi2"sv, DevFmtAmbi3D, 2_u8},
-                ChannelMap{"ambi3"sv, DevFmtAmbi3D, 3_u8},
-                ChannelMap{"ambi4"sv, DevFmtAmbi3D, 4_u8},
-                ChannelMap{"surround51rear"sv, DevFmtX51, 0_u8},
+                ChannelMap{"mono"sv,       DevFmtMono,   0},
+                ChannelMap{"stereo"sv,     DevFmtStereo, 0},
+                ChannelMap{"quad"sv,       DevFmtQuad,   0},
+                ChannelMap{"surround51"sv, DevFmtX51,    0},
+                ChannelMap{"surround61"sv, DevFmtX61,    0},
+                ChannelMap{"surround71"sv, DevFmtX71,    0},
+                ChannelMap{"3d71"sv,         DevFmtX3D71, 0},
+                ChannelMap{"surround714"sv,  DevFmtX714,  0},
+                ChannelMap{"surround7144"sv, DevFmtX7144, 0},
+                ChannelMap{"ambi1"sv, DevFmtAmbi3D, 1},
+                ChannelMap{"ambi2"sv, DevFmtAmbi3D, 2},
+                ChannelMap{"ambi3"sv, DevFmtAmbi3D, 3},
+                ChannelMap{"ambi4"sv, DevFmtAmbi3D, 4},
+                ChannelMap{"surround51rear"sv, DevFmtX51, 0},
             };
 
             const auto iter = std::ranges::find_if(chanlist,
                 [svfmt=std::string_view{*chanopt}](ChannelMap const &entry) -> bool
-                { return is_eq(al::ci_compare(entry.name, svfmt)); });
+                { return al::ci_equal(entry.name, svfmt); });
             if(iter == chanlist.end())
                 ERR("Unsupported channels: {}", *chanopt);
             else
             {
                 optchans = iter->chans;
-                aorder = iter->order.c_val;
+                aorder = iter->order;
             }
         }
         else if(chanopt)
@@ -1246,23 +1245,22 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
         }
         if(auto ambiopt = device.configValue<std::string>({}, "ambi-format"sv))
         {
-            if(is_eq(al::ci_compare(*ambiopt, "fuma"sv)))
+            if(al::ci_equal(*ambiopt, "fuma"sv))
             {
                 optlayout = DevAmbiLayout::FuMa;
                 optscale = DevAmbiScaling::FuMa;
             }
-            else if(is_eq(al::ci_compare(*ambiopt, "acn+fuma"sv)))
+            else if(al::ci_equal(*ambiopt, "acn+fuma"sv))
             {
                 optlayout = DevAmbiLayout::ACN;
                 optscale = DevAmbiScaling::FuMa;
             }
-            else if(is_eq(al::ci_compare(*ambiopt, "ambix"sv))
-                or is_eq(al::ci_compare(*ambiopt, "acn+sn3d"sv)))
+            else if(al::ci_equal(*ambiopt, "ambix"sv) or al::ci_equal(*ambiopt, "acn+sn3d"sv))
             {
                 optlayout = DevAmbiLayout::ACN;
                 optscale = DevAmbiScaling::SN3D;
             }
-            else if(is_eq(al::ci_compare(*ambiopt, "acn+n3d"sv)))
+            else if(al::ci_equal(*ambiopt, "acn+n3d"sv))
             {
                 optlayout = DevAmbiLayout::ACN;
                 optscale = DevAmbiScaling::N3D;
@@ -1282,28 +1280,27 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
         {
             WARN("general/hrtf is deprecated, please use stereo-encoding instead");
 
-            if(is_eq(al::ci_compare(*hrtfopt, "true"sv)))
+            if(al::ci_equal(*hrtfopt, "true"sv))
                 stereomode = StereoEncoding::Hrtf;
-            else if(is_eq(al::ci_compare(*hrtfopt, "false"sv)))
+            else if(al::ci_equal(*hrtfopt, "false"sv))
             {
                 if(!stereomode || *stereomode == StereoEncoding::Hrtf)
                     stereomode = StereoEncoding::Default;
             }
-            else if(is_neq(al::ci_compare(*hrtfopt, "auto"sv)))
+            else if(al::ci_nequal(*hrtfopt, "auto"sv))
                 ERR("Unexpected hrtf value: {}", *hrtfopt);
         }
     }
 
     if(auto encopt = device.configValue<std::string>({}, "stereo-encoding"sv))
     {
-        if(is_eq(al::ci_compare(*encopt, "basic"sv))
-            or is_eq(al::ci_compare(*encopt, "panpot"sv)))
+        if(al::ci_equal(*encopt, "basic"sv) or al::ci_equal(*encopt, "panpot"sv))
             stereomode = StereoEncoding::Basic;
-        else if(is_eq(al::ci_compare(*encopt, "uhj"sv)))
+        else if(al::ci_equal(*encopt, "uhj"sv))
             stereomode = StereoEncoding::Uhj;
-        else if(is_eq(al::ci_compare(*encopt, "tsme"sv)))
+        else if(al::ci_equal(*encopt, "tsme"sv))
             stereomode = StereoEncoding::Tsme;
-        else if(is_eq(al::ci_compare(*encopt, "hrtf"sv)))
+        else if(al::ci_equal(*encopt, "hrtf"sv))
             stereomode = StereoEncoding::Hrtf;
         else
             ERR("Unexpected stereo-encoding: {}", *encopt);
@@ -1639,11 +1636,11 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
     {
         if(auto modeopt = device.configValue<std::string>({}, "stereo-mode"))
         {
-            if(is_eq(al::ci_compare(*modeopt, "headphones"sv)))
+            if(al::ci_equal(*modeopt, "headphones"sv))
                 device.mFlags.set(DeviceFlag::DirectEar);
-            else if(is_eq(al::ci_compare(*modeopt, "speakers"sv)))
+            else if(al::ci_equal(*modeopt, "speakers"sv))
                 device.mFlags.reset(DeviceFlag::DirectEar);
-            else if(is_neq(al::ci_compare(*modeopt, "auto"sv)))
+            else if(al::ci_nequal(*modeopt, "auto"sv))
                 ERR("Unexpected stereo-mode: {}", *modeopt);
         }
     }
@@ -1700,17 +1697,15 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
     case DevFmtAmbi3D: break;
     }
 
-    auto sample_delay = usize{
-        std::visit(overloaded {
-            [](std::monostate const&) { return 0_uz; },
-            [](AmbiDecPostProcess const&) { return 0_uz; },
-            [](HrtfPostProcess const&) { return 0_uz; },
-            [](UhjPostProcess const &pp) { return pp.mUhjEncoder->getDelay(); },
-            [](TsmePostProcess const &pp) { return pp.mTsmeEncoder->getDelay(); },
-            [](StablizerPostProcess const&) { return 0_uz; },
-            [](Bs2bPostProcess const&) { return 0_uz; },
-        }, device.mPostProcess)
-    };
+    auto sample_delay = std::visit(overloaded {
+        [](std::monostate const&) { return 0_uz; },
+        [](AmbiDecPostProcess const&) { return 0_uz; },
+        [](HrtfPostProcess const&) { return 0_uz; },
+        [](UhjPostProcess const &pp) { return pp.mUhjEncoder->getDelay(); },
+        [](TsmePostProcess const &pp) { return pp.mTsmeEncoder->getDelay(); },
+        [](StablizerPostProcess const&) { return 0_uz; },
+        [](Bs2bPostProcess const&) { return 0_uz; },
+    }, device.mPostProcess);
 
     if(device.getConfigValueBool({}, "dither"sv, true))
     {
@@ -1801,8 +1796,8 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
     }
 
     /* Convert the sample delay from samples to nanosamples to nanoseconds. */
-    sample_delay = std::min(sample_delay, i32::max().as<usize>());
-    device.FixedLatency += nanoseconds{seconds{sample_delay.c_val}} / device.mSampleRate;
+    sample_delay = std::min(sample_delay, std::size_t{std::numeric_limits<std::int32_t>::max()});
+    device.FixedLatency += nanoseconds{seconds{sample_delay}} / device.mSampleRate;
     TRACE("Fixed device latency: {}ns", device.FixedLatency.count());
 
     auto mixer_mode = FPUCtl{};
@@ -1856,9 +1851,9 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
             auto usemask = ~sublist.mFreeMask;
             while(usemask != 0)
             {
-                const auto idx = usemask.countr_zero();
-                auto &slot = (*sublist.mEffectSlots)[idx.c_val];
-                usemask &= ~(1_u64 << idx);
+                const auto idx = as_unsigned(std::countr_zero(usemask));
+                auto &slot = (*sublist.mEffectSlots)[idx];
+                usemask &= ~(std::uint64_t{1} << idx);
 
                 const auto slotbase = slot.mSlot;
                 aluInitEffectPanning(slotbase, context);
@@ -1885,9 +1880,9 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
             auto usemask = ~sublist.mFreeMask;
             while(usemask != 0)
             {
-                const auto idx = usemask.countr_zero();
-                auto &source = (*sublist.mSources)[idx.c_val];
-                usemask &= ~(1_u64 << idx);
+                const auto idx = as_unsigned(std::countr_zero(usemask));
+                auto &source = (*sublist.mSources)[idx];
+                usemask &= ~(std::uint64_t{1} << idx);
 
                 const auto sendrange = source.mSend | std::views::drop(num_sends);
                 std::ranges::fill(sendrange, al::Source::SendData{.mSlot={}, .mGain=1.0f,
@@ -2350,13 +2345,13 @@ auto GetIntegerv(al::Device *const device, ALCenum const param, std::span<ALCint
     auto NumAttrsForDevice = [device]
     {
         if(device->Type == DeviceType::Loopback && device->FmtChans == DevFmtAmbi3D)
-            return 39_u8;
-        return 33_u8;
+            return std::uint8_t{39};
+        return std::uint8_t{33};
     };
     switch(param)
     {
     case ALC_ATTRIBUTES_SIZE:
-        values[0] = NumAttrsForDevice().c_val;
+        values[0] = NumAttrsForDevice();
         return 1;
 
     case ALC_ALL_ATTRIBUTES:
@@ -2621,13 +2616,13 @@ try {
     auto NumAttrsForDevice = [&dev]
     {
         if(dev->Type == DeviceType::Loopback && dev->FmtChans == DevFmtAmbi3D)
-            return 43_u8;
-        return 37_u8;
+            return std::uint8_t{43};
+        return std::uint8_t{37};
     };
     switch(pname)
     {
     case ALC_ATTRIBUTES_SIZE:
-        valuespan[0] = ALCint64SOFT{NumAttrsForDevice().c_val};
+        valuespan[0] = ALCint64SOFT{NumAttrsForDevice()};
         break;
 
     case ALC_ALL_ATTRIBUTES:
@@ -2779,7 +2774,7 @@ try {
 
     const auto extlist = dev ? std::span{extarray}.subspan(0) : std::span{nodevextarray};
     const auto matchext = [tofind = std::string_view{extName}](const std::string_view entry)
-    { return tofind.size() == entry.size() and is_eq(al::ci_compare(tofind, entry)); };
+    { return al::ci_equal(tofind, entry); };
     return std::ranges::any_of(extlist, matchext) ? ALC_TRUE : ALC_FALSE;
 }
 catch(al::base_exception&) {
@@ -3087,22 +3082,22 @@ try {
     if(!devname.empty())
     {
         TRACE("Opening playback device \"{}\"", devname);
-        if(is_eq(al::ci_compare(devname, GetDefaultName()))
+        if(al::ci_equal(devname, GetDefaultName())
 #ifdef _WIN32
             /* Some old Windows apps hardcode these expecting OpenAL to use a
              * specific audio API, even when they're not enumerated. Creative's
              * router effectively ignores them too.
              */
-            or is_eq(al::ci_compare(devname, "DirectSound3D"sv))
-            or is_eq(al::ci_compare(devname, "DirectSound"sv))
-            or is_eq(al::ci_compare(devname, "MMSYSTEM"sv))
+            or al::ci_equal(devname, "DirectSound3D"sv)
+            or al::ci_equal(devname, "DirectSound"sv)
+            or al::ci_equal(devname, "MMSYSTEM"sv)
 #endif
             /* Some old Linux apps hardcode configuration strings that were
              * supported by the OpenAL SI. We can't really do anything useful
              * with them, so just ignore.
              */
             or devname.starts_with("'("sv)
-            or is_eq(al::ci_compare(devname, "openal-soft"sv)))
+            or al::ci_equal(devname, "openal-soft"sv))
             devname = {};
         else
         {
@@ -3273,8 +3268,7 @@ try {
     if(!devname.empty())
     {
         TRACE("Opening capture device \"{}\"", devname);
-        if(is_eq(al::ci_compare(devname, GetDefaultName()))
-            or is_eq(al::ci_compare(devname, "openal-soft"sv)))
+        if(al::ci_equal(devname, GetDefaultName()) or al::ci_equal(devname, "openal-soft"sv))
             devname = {};
         else
         {
@@ -3748,7 +3742,7 @@ try {
     auto devname = std::string_view{deviceName ? deviceName : ""};
     if(!devname.empty())
     {
-        if(is_eq(al::ci_compare(devname, GetDefaultName())))
+        if(al::ci_equal(devname, GetDefaultName()))
             devname = {};
         else
         {
