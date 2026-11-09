@@ -724,7 +724,6 @@ set(COMMON_SRCS
     common/almalloc.cpp
     common/alstring.cpp
     common/althrd_setname.cpp
-    common/altypes.cpp
     common/dynload.cpp
     common/envutils.cpp
     common/filesystem.cpp
@@ -739,7 +738,6 @@ set(COMMON_HDRS
     common/alstring.h
     common/althrd_setname.h
     common/althreads.h
-    common/altypes.hpp
     common/atomic.h
     common/bitset.hpp
     common/cemath.hpp
@@ -756,6 +754,7 @@ set(COMMON_HDRS
     common/instance_of.hpp
     common/intrusive_ptr.h
     common/numeric.hpp
+    common/opthelper_macros.hpp
     common/opthelpers.h
     common/pffft.h
     common/polyphase_resampler.h
@@ -783,7 +782,6 @@ if(HAVE_CXXMODULES)
         alsoft-modules/gsl.cppm
         common/alformat.cppm
         common/alstring.cppm
-        common/altypes.cppm
         common/cemath.cppm
         common/filesystem.cppm
         common/hann_window.cppm
@@ -795,7 +793,6 @@ if(HAVE_CXXMODULES)
 else()
     list(APPEND COMMON_HDRS
         common/alformatpath.hpp
-        common/alformattypes.hpp
         common/alformatzsv.hpp
         common/hann_window.hpp
         common/phase_shifter.hpp
