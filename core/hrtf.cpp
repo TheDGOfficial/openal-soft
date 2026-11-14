@@ -24,7 +24,6 @@
 #include <utility>
 #include <vector>
 
-#include "ambidefs.h"
 #include "filters/splitter.h"
 #include "gsl/gsl"
 #include "hrtf_loader.hpp"
@@ -36,6 +35,7 @@
 
 #if HAVE_CXXMODULES
 import alstring;
+import core.ambi_utils;
 import core.helpers;
 import filesystem;
 import format;
@@ -47,6 +47,7 @@ import spanstream;
 #include "alformat.hpp"
 #include "alformatpath.hpp"
 #include "alstring.h"
+#include "core/ambi_utils.hpp"
 #include "core/helpers.hpp"
 #include "core/hrtfstore.hpp"
 #include "core/logging.h"
@@ -160,13 +161,13 @@ void HrtfStore::getCoeffs(float const elevation, float const azimuth, float cons
         + mDelays[idx[1]][0]*blend[1]
         + mDelays[idx[2]][0]*blend[2]
         + mDelays[idx[3]][0]*blend[3];
-    delays[0] = fastf2u(d * float{1.0f/HrirDelayFracOne});
+    delays[0] = al::saturating_cast<unsigned>(d*float{1.0f/HrirDelayFracOne} + 0.5f);
 
     d = mDelays[idx[0]][1]*blend[0]
         + mDelays[idx[1]][1]*blend[1]
         + mDelays[idx[2]][1]*blend[2]
         + mDelays[idx[3]][1]*blend[3];
-    delays[1] = fastf2u(d * float{1.0f/HrirDelayFracOne});
+    delays[1] = al::saturating_cast<unsigned>(d*float{1.0f/HrirDelayFracOne} + 0.5f);
 
     /* Calculate the blended HRIR coefficients. */
     coeffs[0][0] = PassthruCoeff * (1.0f-dirfact);

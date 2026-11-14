@@ -31,7 +31,6 @@
 #include <span>
 
 #include "alc/effects/base.h"
-#include "core/ambidefs.h"
 #include "core/bufferline.h"
 #include "core/effects/base.h"
 #include "core/effectslot.h"
@@ -46,11 +45,13 @@
 #include "zudl.hpp"
 
 #if HAVE_CXXMODULES
+import core.ambi_utils;
 import core.context;
 import core.device;
 import cubic_tables;
 import numeric;
 #else
+#include "core/ambi_utils.hpp"
 #include "core/context.h"
 #include "core/cubic_tables.hpp"
 #include "core/device.h"
@@ -988,7 +989,7 @@ void Modulation::updateModulator(float const modTime, float const modDepth, floa
      * appropriate step size to generate an LFO, which will vary the feedback
      * delay over time.
      */
-    Step = std::max(fastf2u(MOD_FRACONE / (frequency * modTime)), 1u);
+    Step = std::max(al::saturating_cast<unsigned>(MOD_FRACONE/(frequency*modTime) + 0.5f), 1u);
 
     /* The modulation depth effects the amount of frequency change over the
      * range of the sinus. It needs to be scaled by the modulation time so that
@@ -1067,8 +1068,11 @@ void LateReverb::updateLines(float const density_mult, float const diffusion,
      */
     std::ranges::transform(LATE_ALLPASS_LENGTHS, lengths, lengths.begin(),
         [density_mult,diffusion,moddepth=Mod.Depth/frequency](float const length,
-        float const curlength) -> float
-    { return lerpf(length, LateAllpassAverage, diffusion)*density_mult + moddepth + curlength; });
+            float const curlength) -> float
+        {
+            return al::lerp(length, LateAllpassAverage, diffusion)*density_mult + moddepth
+                + curlength;
+        });
 
     /* Calculate the T60 damping coefficients for each line. */
     std::ignore = std::ranges::mismatch(T60, lengths,
@@ -1606,9 +1610,10 @@ void ReverbPipeline::processEarly(DelayLineU const &main_delay, std::size_t offs
                 tmp = std::ranges::transform(input.subspan(early_delay_tap0, td),
                     input.subspan(early_delay_tap1, td), tmp,
                     [earlycoeff0,earlycoeff1,fadeStep,&fadeCount](float const in0, float const in1)
-                    noexcept -> float
+                        noexcept -> float
                 {
-                    const auto ret = lerpf(in0*earlycoeff0, in1*earlycoeff1, fadeStep*fadeCount);
+                    auto const ret = al::lerp(in0*earlycoeff0, in1*earlycoeff1,
+                        fadeStep*fadeCount);
                     fadeCount += 1.0f;
                     return ret;
                 }).out;

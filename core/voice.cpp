@@ -2,8 +2,6 @@
 #include "config.h"
 #include "config_simd.h"
 
-#include "voice.h"
-
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -18,9 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include "ambidefs.h"
 #include "async_event.h"
-#include "buffer_storage.h"
 #include "context.h"
 #include "cpu_caps.h"
 #include "filters/biquad.h"
@@ -39,13 +35,19 @@
 
 #if HAVE_CXXMODULES
 import alstring;
+import core.ambi_utils;
+import core.buffer_storage;
 import core.device;
+import core.voice;
 import logging;
 import numeric;
 #else
 #include "alstring.h"
+#include "core/ambi_utils.hpp"
+#include "core/buffer_storage.h"
 #include "core/device.h"
 #include "core/logging.h"
+#include "core/voice.h"
 #include "numeric.hpp"
 #endif
 
@@ -869,7 +871,7 @@ void DoHrtfMix(std::span<float const> const samples, DirectParams &parms, float 
         if(counter > fademix)
         {
             auto const a = gsl::narrow_cast<float>(fademix) / gsl::narrow_cast<float>(counter);
-            gain = lerpf(parms.Hrtf.Old.Gain, targetGain, a);
+            gain = al::lerp(parms.Hrtf.Old.Gain, targetGain, a);
         }
 
         auto const hrtfparams = MixHrtfFilter{
@@ -897,7 +899,7 @@ void DoHrtfMix(std::span<float const> const samples, DirectParams &parms, float 
         {
             auto const a = gsl::narrow_cast<float>(todo)
                 / gsl::narrow_cast<float>(counter-fademix);
-            gain = lerpf(parms.Hrtf.Old.Gain, targetGain, a);
+            gain = al::lerp(parms.Hrtf.Old.Gain, targetGain, a);
         }
 
         auto const hrtfparams = MixHrtfFilter{

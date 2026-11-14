@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -43,16 +44,13 @@
 #include <variant>
 
 #include "atomic.h"
-#include "core/ambidefs.h"
 #include "core/async_event.h"
 #include "core/bformatdec.h"
 #include "core/bs2b.h"
 #include "core/bsinc_defs.h"
 #include "core/bufferline.h"
-#include "core/buffer_storage.h"
 #include "core/cpu_caps.h"
 #include "core/effects/base.h"
-#include "core/effectslot.h"
 #include "core/filters/biquad.h"
 #include "core/filters/nfc.h"
 #include "core/fpu_ctrl.h"
@@ -61,10 +59,10 @@
 #include "core/mixer.h"
 #include "core/mixer/defs.h"
 #include "core/mixer/hrtfdefs.h"
+#include "core/mixparams.hpp"
 #include "core/resampler_limits.hpp"
 #include "core/storage_formats.h"
 #include "core/uhjfilter.h"
-#include "core/voice.h"
 #include "core/voice_change.h"
 #include "core/front_stablizer.h"
 #include "envutils.hpp"
@@ -79,8 +77,12 @@
 import alstring;
 import bsinc_tables;
 import cemath;
+import core.ambi_utils;
+import core.buffer_storage;
 import core.context;
 import core.device;
+import core.effectslot;
+import core.voice;
 import cubic_tables;
 import format;
 import hrtfstore;
@@ -89,12 +91,16 @@ import numeric;
 #include "alformat.hpp"
 #include "alstring.h"
 #include "cemath.hpp"
+#include "core/ambi_utils.hpp"
 #include "core/bsinc_tables.hpp"
 #include "core/context.h"
 #include "core/cubic_tables.hpp"
+#include "core/buffer_storage.h"
 #include "core/device.h"
 #include "core/devfmttraits.hpp"
+#include "core/effectslot.h"
 #include "core/hrtfstore.hpp"
+#include "core/voice.h"
 #include "numeric.hpp"
 #endif
 
@@ -1264,9 +1270,9 @@ void CalcHrtfPanning(Voice *const voice, float const xpos, float const ypos, flo
              */
             auto const a = 1.0f - (std::numbers::inv_pi_v<float>*0.5f)*spread;
             auto pos = std::array{
-                lerpf(chans[c].pos[0], xpos, a),
-                lerpf(chans[c].pos[1], ypos, a),
-                lerpf(chans[c].pos[2], zpos, a)};
+                std::lerp(chans[c].pos[0], xpos, a),
+                std::lerp(chans[c].pos[1], ypos, a),
+                std::lerp(chans[c].pos[2], zpos, a)};
             if(auto const len = std::sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]);
                 len < 1.0f)
             {
@@ -1410,9 +1416,9 @@ void CalcNormalPanning(Voice *const voice, float const xpos, float const ypos, f
              */
             auto const a = 1.0f - (std::numbers::inv_pi_v<float>*0.5f)*spread;
             auto pos = std::array{
-                lerpf(chans[c].pos[0], xpos, a),
-                lerpf(chans[c].pos[1], ypos, a),
-                lerpf(chans[c].pos[2], zpos, a)};
+                std::lerp(chans[c].pos[0], xpos, a),
+                std::lerp(chans[c].pos[1], ypos, a),
+                std::lerp(chans[c].pos[2], zpos, a)};
             if(auto const len = std::sqrt(pos[0]*pos[0] + pos[1]*pos[1] + pos[2]*pos[2]);
                 len < 1.0f)
             {
@@ -1707,7 +1713,7 @@ void CalcNonAttnVoiceParams(Voice *const voice, ContextBase const *const context
     if(pitch > float{MaxPitch})
         voice->mStep = MaxPitch<<MixerFracBits;
     else
-        voice->mStep = std::max(fastf2u(pitch * MixerFracOne), 1u);
+        voice->mStep = std::max(al::saturating_cast<unsigned>(pitch*MixerFracOne + 0.5f), 1u);
     voice->mResampler = PrepareResampler(props.mResampler, voice->mStep, &voice->mResampleState);
 
     /* Calculate gains */
@@ -1822,7 +1828,7 @@ void CalcAttnVoiceParams(Voice *const voice, ContextBase const *const context) n
     case DistanceModel::InverseClamped:
         if(props.RefDistance > 0.0f)
         {
-            if(auto const dist = lerpf(props.RefDistance, attenDistance, props.RolloffFactor);
+            if(auto const dist = std::lerp(props.RefDistance, attenDistance, props.RolloffFactor);
                 dist > 0.0f)
             {
                 dryAttnBase = props.RefDistance / dist;
@@ -1833,7 +1839,7 @@ void CalcAttnVoiceParams(Voice *const voice, ContextBase const *const context) n
             std::ranges::transform(wetbase | std::views::take(numsends), roomrolloff,
                 wetbase.begin(), [&props,attenDistance](float const gain, float const rolloff)
             {
-                if(auto const dist = lerpf(props.RefDistance, attenDistance, rolloff);
+                if(auto const dist = std::lerp(props.RefDistance, attenDistance, rolloff);
                     dist > 0.0f)
                     return gain * (props.RefDistance / dist);
                 return gain;
@@ -1893,8 +1899,8 @@ void CalcAttnVoiceParams(Voice *const voice, ContextBase const *const context) n
         else if(angle >= props.InnerAngle)
         {
             const auto scale = (angle-props.InnerAngle) / (props.OuterAngle-props.InnerAngle);
-            conegain = lerpf(1.0f, props.OuterGain, scale);
-            conehf = lerpf(1.0f, props.OuterGainHF, scale);
+            conegain = std::lerp(1.0f, props.OuterGain, scale);
+            conehf = std::lerp(1.0f, props.OuterGainHF, scale);
         }
 
         drygain.Base *= conegain;
@@ -2021,7 +2027,7 @@ void CalcAttnVoiceParams(Voice *const voice, ContextBase const *const context) n
     if(pitch > float{MaxPitch})
         voice->mStep = MaxPitch<<MixerFracBits;
     else
-        voice->mStep = std::max(fastf2u(pitch * MixerFracOne), 1u);
+        voice->mStep = std::max(al::saturating_cast<unsigned>(pitch*MixerFracOne + 0.5f), 1u);
     voice->mResampler = PrepareResampler(props.mResampler, voice->mStep, &voice->mResampleState);
 
     auto spread = 0.0f;
