@@ -251,8 +251,8 @@ void VmorpherState::update(const ContextBase *context, const EffectSlotBase *slo
     auto const &device = context->mDevice;
     const auto frequency = static_cast<float>(device.mSampleRate);
     const auto step = props.Rate / frequency;
-    mStep = al::saturating_cast<unsigned>(std::clamp(step*WaveformFracOne + 0.5f, 0.0f,
-        WaveformFracOne-1.0f));
+    mStep = std::min(al::saturating_round<unsigned>(step * WaveformFracOne),
+        unsigned{WaveformFracOne-1});
 
     if(mStep == 0)
         mGetSamples = Oscillate<Half>;
@@ -350,8 +350,8 @@ struct VmorpherStateFactory final : public EffectStateFactory {
 
 } // namespace
 
-auto VmorpherStateFactory_getFactory() -> gsl::not_null<EffectStateFactory*>
+auto VmorpherStateFactory_getFactory() -> EffectStateFactory&
 {
-    static VmorpherStateFactory VmorpherFactory{};
-    return gsl::make_not_null(&VmorpherFactory);
+    static auto VmorpherFactory = VmorpherStateFactory{};
+    return VmorpherFactory;
 }

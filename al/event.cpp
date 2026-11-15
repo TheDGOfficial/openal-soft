@@ -1,6 +1,7 @@
 
 #include "config.h"
 
+#include <algorithm>
 #include <atomic>
 #include <exception>
 #include <mutex>
@@ -19,7 +20,6 @@
 #include "core/except.h"
 #include "direct_defs.h"
 #include "intrusive_ptr.h"
-#include "ringbuffer.h"
 
 #if HAVE_CXXMODULES
 import openal;

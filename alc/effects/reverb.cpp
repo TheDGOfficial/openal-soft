@@ -38,7 +38,6 @@
 #include "core/filters/splitter.h"
 #include "core/mixer.h"
 #include "core/mixer/defs.h"
-#include "gsl/gsl"
 #include "intrusive_ptr.h"
 #include "opthelpers.h"
 #include "vector.h"
@@ -49,12 +48,15 @@ import core.ambi_utils;
 import core.context;
 import core.device;
 import cubic_tables;
+import gsl;
 import numeric;
+#include "gsl_macros.hpp"
 #else
 #include "core/ambi_utils.hpp"
 #include "core/context.h"
 #include "core/cubic_tables.hpp"
 #include "core/device.h"
+#include "gsl/gsl"
 #include "numeric.hpp"
 #endif
 
@@ -989,7 +991,7 @@ void Modulation::updateModulator(float const modTime, float const modDepth, floa
      * appropriate step size to generate an LFO, which will vary the feedback
      * delay over time.
      */
-    Step = std::max(al::saturating_cast<unsigned>(MOD_FRACONE/(frequency*modTime) + 0.5f), 1u);
+    Step = std::max(al::saturating_round<unsigned>(float{MOD_FRACONE} / (frequency*modTime)), 1u);
 
     /* The modulation depth effects the amount of frequency change over the
      * range of the sinus. It needs to be scaled by the modulation time so that
@@ -1905,8 +1907,8 @@ struct ReverbStateFactory final : EffectStateFactory {
 
 } // namespace
 
-auto ReverbStateFactory_getFactory() -> gsl::not_null<EffectStateFactory*>
+auto ReverbStateFactory_getFactory() -> EffectStateFactory&
 {
-    static ReverbStateFactory ReverbFactory{};
-    return gsl::make_not_null(&ReverbFactory);
+    static auto ReverbFactory = ReverbStateFactory{};
+    return ReverbFactory;
 }

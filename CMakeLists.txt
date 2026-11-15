@@ -760,6 +760,7 @@ set(COMMON_HDRS
     common/filesystem.h
     common/flexarray.h
     common/ghc_filesystem.h
+    common/gsl_macros.hpp
     common/inout_ptr.hpp
     common/instance_of.hpp
     common/intrusive_ptr.h
@@ -770,7 +771,7 @@ set(COMMON_HDRS
     common/pffft.h
     common/polyphase_resampler.h
     common/pragmadefs.h
-    common/ringbuffer.h
+    common/ringbuffer.hpp
     common/spanstream.hpp
     common/vecmat.h
     common/vector.h
@@ -791,13 +792,16 @@ if(HAVE_CXXMODULES)
     list(APPEND COMMON_MODS
         alsoft-modules/fmtlib.cppm
         alsoft-modules/gsl.cppm
+        alsoft-modules/std.cppm
         common/alformat.cppm
         common/alstring.cppm
         common/cemath.cppm
         common/filesystem.cppm
         common/hann_window.cppm
+        common/inout_ptr.cppm
         common/numeric.cppm
         common/phase_shifter.cppm
+        common/ringbuffer.cppm
         common/spanstream.cppm
         common/zstring_view.cppm
     )

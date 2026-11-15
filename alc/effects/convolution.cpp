@@ -45,6 +45,7 @@ import core.device;
 import core.effectslot;
 import gsl;
 import numeric;
+#include "gsl_macros.hpp"
 #else
 #include "core/ambi_utils.hpp"
 #include "core/buffer_storage.h"
@@ -734,8 +735,8 @@ struct ConvolutionStateFactory final : public EffectStateFactory {
 
 } // namespace
 
-auto ConvolutionStateFactory_getFactory() -> gsl::not_null<EffectStateFactory*>
+auto ConvolutionStateFactory_getFactory() -> EffectStateFactory&
 {
-    static ConvolutionStateFactory ConvolutionFactory{};
-    return gsl::make_not_null(&ConvolutionFactory);
+    static auto ConvolutionFactory = ConvolutionStateFactory{};
+    return ConvolutionFactory;
 }

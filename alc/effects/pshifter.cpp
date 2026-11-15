@@ -144,7 +144,7 @@ void PshifterState::update(const ContextBase*, const EffectSlotBase *slot,
     auto &props = IGNORE_FUNCTION_EFFECTS(std::get<PshifterProps>(*props_));
     const auto tune = static_cast<float>(props.CoarseTune*100 + props.FineTune);
     const auto pitch = std::clamp(std::pow(2.0f, tune/1200.0f), 0.5f, 2.0f);
-    mPitchShiftI = al::saturating_cast<unsigned>(pitch*MixerFracOne + 0.5f);
+    mPitchShiftI = al::saturating_round<unsigned>(pitch * MixerFracOne);
     mPitchShift = static_cast<float>(mPitchShiftI) * float{1.0f/MixerFracOne};
 
     mOutTarget = target.Main->Buffer;
@@ -413,8 +413,8 @@ struct PshifterStateFactory final : EffectStateFactory {
 
 } // namespace
 
-auto PshifterStateFactory_getFactory() -> gsl::not_null<EffectStateFactory*>
+auto PshifterStateFactory_getFactory() -> EffectStateFactory&
 {
-    static PshifterStateFactory PshifterFactory{};
-    return gsl::make_not_null(&PshifterFactory);
+    static auto PshifterFactory = PshifterStateFactory{};
+    return PshifterFactory;
 }

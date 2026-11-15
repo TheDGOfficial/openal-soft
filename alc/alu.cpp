@@ -66,10 +66,8 @@
 #include "core/voice_change.h"
 #include "core/front_stablizer.h"
 #include "envutils.hpp"
-#include "gsl/gsl"
 #include "intrusive_ptr.h"
 #include "opthelpers.h"
-#include "ringbuffer.h"
 #include "vecmat.h"
 #include "zudl.hpp"
 
@@ -85,8 +83,10 @@ import core.effectslot;
 import core.voice;
 import cubic_tables;
 import format;
+import gsl;
 import hrtfstore;
 import numeric;
+#include "gsl_macros.hpp"
 #else
 #include "alformat.hpp"
 #include "alstring.h"
@@ -101,6 +101,7 @@ import numeric;
 #include "core/effectslot.h"
 #include "core/hrtfstore.hpp"
 #include "core/voice.h"
+#include "gsl/gsl"
 #include "numeric.hpp"
 #endif
 
@@ -1713,7 +1714,7 @@ void CalcNonAttnVoiceParams(Voice *const voice, ContextBase const *const context
     if(pitch > float{MaxPitch})
         voice->mStep = MaxPitch<<MixerFracBits;
     else
-        voice->mStep = std::max(al::saturating_cast<unsigned>(pitch*MixerFracOne + 0.5f), 1u);
+        voice->mStep = std::max(al::saturating_round<unsigned>(pitch * MixerFracOne), 1u);
     voice->mResampler = PrepareResampler(props.mResampler, voice->mStep, &voice->mResampleState);
 
     /* Calculate gains */
@@ -2027,7 +2028,7 @@ void CalcAttnVoiceParams(Voice *const voice, ContextBase const *const context) n
     if(pitch > float{MaxPitch})
         voice->mStep = MaxPitch<<MixerFracBits;
     else
-        voice->mStep = std::max(al::saturating_cast<unsigned>(pitch*MixerFracOne + 0.5f), 1u);
+        voice->mStep = std::max(al::saturating_round<unsigned>(pitch * MixerFracOne), 1u);
     voice->mResampler = PrepareResampler(props.mResampler, voice->mStep, &voice->mResampleState);
 
     auto spread = 0.0f;
