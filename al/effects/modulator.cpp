@@ -2,30 +2,37 @@
 #include "config.h"
 
 #include <optional>
-#include <stdexcept>
-
-#include "AL/al.h"
-#include "AL/efx.h"
 
 #include "effects.h"
 #include "opthelpers.h"
 
 #if ALSOFT_EAX
 #include "al/eax/effect.h"
-#include "al/eax/exception.h"
 #if HAVE_CXXMODULES
+import eax.exception;
 import eax.validator;
 #else
+#include "al/eax/exception.hpp"
 #include "al/eax/validator.hpp"
 #endif
 #endif // ALSOFT_EAX
 
 #if HAVE_CXXMODULES
+import common.std;
+import openal;
+
 import alc.context;
 import format;
 import gsl;
 import numeric;
+
 #else
+
+#include <stdexcept>
+
+#include "AL/al.h"
+#include "AL/efx.h"
+
 #include "alc/context.hpp"
 #include "alformat.hpp"
 #include "gsl/gsl"

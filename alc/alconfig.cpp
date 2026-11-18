@@ -38,10 +38,8 @@
 #include <cstdlib>
 #include <limits>
 #include <ranges>
-#include <stdexcept>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 #include "envutils.hpp"
@@ -55,8 +53,9 @@ using namespace winrt;
 #endif
 
 #if HAVE_CXXMODULES
-import alstring;
 import common.std;
+
+import alstring;
 import core.helpers;
 import filesystem;
 import fmtlib;
@@ -64,8 +63,13 @@ import gsl;
 import inout_ptr;
 import logging;
 import numeric;
+
 #else
+
 #include <istream>
+#include <stdexcept>
+#include <utility>
+
 #include "alformatpath.hpp"
 #include "alstring.h"
 #include "core/helpers.hpp"

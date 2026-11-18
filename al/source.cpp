@@ -40,13 +40,11 @@
 #include <optional>
 #include <ranges>
 #include <span>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include "alc/backends/base.hpp"
@@ -66,16 +64,18 @@
 #if ALSOFT_EAX
 #include "eax/api.h"
 #include "eax/call.h"
-#include "eax/exception.h"
 #include "eax/fx_slot_index.h"
 #if HAVE_CXXMODULES
+import eax.exception;
 import eax.validator;
 #else
+#include "eax/exception.hpp"
 #include "eax/validator.hpp"
 #endif
 #endif
 
 #if HAVE_CXXMODULES
+import common.std;
 import openal;
 
 import al.iface;
@@ -87,7 +87,12 @@ import gsl;
 import logging;
 import numeric;
 #include "gsl_macros.hpp"
+
 #else
+
+#include <stdexcept>
+#include <utility>
+
 #include "AL/al.h"
 #include "AL/alext.h"
 #include "AL/efx.h"

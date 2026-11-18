@@ -53,13 +53,10 @@
 #include <numbers>
 #include <optional>
 #include <ranges>
-#include <source_location>
 #include <span>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <utility>
 #include <vector>
 
 #include "alc/events.h"
@@ -159,6 +156,7 @@
 #if !defined(__INTEL_COMPILER) && !defined(__clang__) && defined(__GNUC__) && __GNUC__ == 16
 #include "alc/device.h"
 #endif
+import common.std;
 import openal;
 
 import al.iface;
@@ -174,7 +172,13 @@ import gsl;
 import logging;
 import numeric;
 #include "gsl_macros.hpp"
+
 #else
+
+#include <source_location>
+#include <stdexcept>
+#include <utility>
+
 #include "AL/al.h"
 #include "AL/alc.h"
 #include "AL/alext.h"

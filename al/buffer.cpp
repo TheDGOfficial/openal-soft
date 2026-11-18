@@ -35,9 +35,7 @@
 #include <optional>
 #include <ranges>
 #include <span>
-#include <stdexcept>
 #include <unordered_map>
-#include <utility>
 #include <variant>
 #include <vector>
 
@@ -72,6 +70,7 @@ namespace {
 #define BUFFER_SUBLIST_HACK
 #endif
 
+import common.std;
 import openal;
 
 import al.iface;
@@ -82,7 +81,12 @@ import format;
 import gsl;
 import logging;
 import numeric;
+
 #else
+
+#include <stdexcept>
+#include <utility>
+
 #include "AL/al.h"
 #include "AL/alext.h"
 

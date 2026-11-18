@@ -29,9 +29,7 @@
 #include <deque>
 #include <mutex>
 #include <optional>
-#include <stdexcept>
 #include <string>
-#include <utility>
 
 #include "alc/alu.h"
 #include "alc/inprogext.h"
@@ -49,6 +47,7 @@
 #endif // ALSOFT_EAX
 
 #if HAVE_CXXMODULES
+import common.std;
 import openal;
 
 import al.iface;
@@ -59,7 +58,12 @@ import format;
 import gsl;
 import logging;
 import numeric;
+
 #else
+
+#include <stdexcept>
+#include <utility>
+
 #include "AL/al.h"
 #include "AL/alc.h"
 #include "AL/alext.h"

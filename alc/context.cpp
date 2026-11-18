@@ -7,7 +7,6 @@
 #include <functional>
 #include <optional>
 #include <string_view>
-#include <utility>
 
 #include "alc/alu.h"
 #include "alc/backends/base.hpp"
@@ -24,11 +23,12 @@
 
 #include "al/eax/api.h"
 #include "al/eax/call.h"
-#include "al/eax/exception.h"
 #include "al/eax/globals.h"
 #if HAVE_CXXMODULES
+import eax.exception;
 import eax.validator;
 #else
+#include "al/eax/exception.hpp"
 #include "al/eax/validator.hpp"
 #endif
 #endif // ALSOFT_EAX
@@ -37,12 +37,14 @@ import eax.validator;
 import al.iface;
 import alc.context;
 import alc.device;
+import common.std;
 import fmtlib;
 import gsl;
 import logging;
 import numeric;
 import ringbuffer;
 #else
+#include <utility>
 #include "al/auxeffectslot.h"
 #include "al/debug.h"
 #include "al/effect.h"
