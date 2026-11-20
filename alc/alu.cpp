@@ -23,7 +23,6 @@
 
 #include "alu.h"
 
-#include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
@@ -68,13 +67,13 @@
 #include "intrusive_ptr.h"
 #include "opthelpers.h"
 #include "vecmat.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import alstring;
 import bsinc_tables;
 import cemath;
-import common.std;
 import core.ambi_utils;
 import core.buffer_storage;
 import core.context;
@@ -86,9 +85,14 @@ import format;
 import gsl;
 import hrtfstore;
 import numeric;
+import zudl;
 #include "gsl_macros.hpp"
+
 #else
+
+#include <algorithm>
 #include <utility>
+
 #include "alformat.hpp"
 #include "alstring.h"
 #include "cemath.hpp"
@@ -104,6 +108,7 @@ import numeric;
 #include "core/voice.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 

@@ -34,20 +34,20 @@
 #include <mutex>
 #include <new>
 #include <ranges>
-#include <thread>
 #include <functional>
 
 #include "althrd_setname.h"
 #include "dlopennote.h"
 #include "dynload.h"
 #include "opthelpers.h"
-#include "zudl.hpp"
 
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 #include <SLES/OpenSLES_AndroidConfiguration.h>
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import backends.exception;
 import core.device;
 import core.helpers;
@@ -55,7 +55,12 @@ import gsl;
 import logging;
 import ringbuffer;
 import zstring_view;
+import zudl;
+
 #else
+
+#include <thread>
+
 #include "alc/backends/exception.hpp"
 #include "alformatzsv.hpp"
 #include "core/device.h"
@@ -63,6 +68,7 @@ import zstring_view;
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "ringbuffer.hpp"
+#include "zudl.hpp"
 #endif
 
 

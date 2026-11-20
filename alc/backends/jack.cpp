@@ -22,7 +22,6 @@
 
 #include "jack.hpp"
 
-#include <algorithm>
 #include <array>
 #include <bit>
 #include <cstring>
@@ -30,7 +29,6 @@
 #include <mutex>
 #include <ranges>
 #include <span>
-#include <thread>
 #include <vector>
 
 #include "alc/alconfig.h"
@@ -38,11 +36,12 @@
 #include "dlopennote.h"
 #include "dynload.h"
 #include "opthelpers.h"
-#include "zudl.hpp"
 
 #include <jack/jack.h>
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import backends.exception;
 import core.device;
 import core.helpers;
@@ -53,7 +52,13 @@ import logging;
 import numeric;
 import ringbuffer;
 import zstring_view;
+import zudl;
+
 #else
+
+#include <algorithm>
+#include <thread>
+
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alformatzsv.hpp"
@@ -64,6 +69,7 @@ import zstring_view;
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "ringbuffer.hpp"
+#include "zudl.hpp"
 #endif
 
 

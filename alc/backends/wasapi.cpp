@@ -45,7 +45,6 @@
 #include <ksmedia.h>
 #endif
 
-#include <algorithm>
 #include <atomic>
 #include <bit>
 #include <chrono>
@@ -61,16 +60,13 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <vector>
 
 #include "alc/alconfig.h"
 #include "althrd_setname.h"
 #include "comptr.h"
 #include "core/converter.h"
-#include "gsl/gsl"
 #include "opthelpers.h"
-#include "zudl.hpp"
 
 #if ALSOFT_UWP
 #include <winrt/Windows.Media.Core.h> // !!This is important!!
@@ -98,23 +94,35 @@ DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_GUID, 0x1da5d803, 0xd492, 0x4edd, 0x8c, 0x
 #endif
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import alstring;
 import backends.exception;
 import core.device;
 import format;
+import gsl;
 import inout_ptr;
 import logging;
 import numeric;
 import ringbuffer;
+import zudl;
+#include "gsl_macros.hpp"
+
 #else
+
+#include <algorithm>
+#include <thread>
+
 #include "alc/backends/exception.hpp"
 #include "alstring.h"
 #include "alformat.hpp"
 #include "core/device.h"
 #include "core/logging.h"
+#include "gsl/gsl"
 #include "inout_ptr.hpp"
 #include "numeric.hpp"
 #include "ringbuffer.hpp"
+#include "zudl.hpp"
 #endif
 
 namespace {

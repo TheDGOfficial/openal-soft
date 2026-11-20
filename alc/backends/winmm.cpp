@@ -26,25 +26,24 @@
 #include <mmsystem.h>
 #include <mmreg.h>
 
-#include <algorithm>
 #include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <ranges>
 #include <string>
-#include <thread>
 #include <vector>
 
 #include "althrd_setname.h"
 #include "vector.h"
-#include "zudl.hpp"
 
 #ifndef WAVE_FORMAT_IEEE_FLOAT
 #define WAVE_FORMAT_IEEE_FLOAT  0x0003
 #endif
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import alstring;
 import backends.exception;
 import core.device;
@@ -54,7 +53,13 @@ import gsl;
 import logging;
 import numeric;
 import ringbuffer;
+import zudl;
+
 #else
+
+#include <algorithm>
+#include <thread>
+
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alstring.h"
@@ -64,6 +69,7 @@ import ringbuffer;
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "ringbuffer.hpp"
+#include "zudl.hpp"
 #endif
 
 namespace {

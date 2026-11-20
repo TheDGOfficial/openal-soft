@@ -22,7 +22,6 @@
 
 #include "pipewire.hpp"
 
-#include <algorithm>
 #include <array>
 #include <atomic>
 #include <bit>
@@ -41,7 +40,6 @@
 #include <optional>
 #include <span>
 #include <string_view>
-#include <thread>
 #include <tuple>
 
 #include "alc/alconfig.h"
@@ -126,9 +124,10 @@ constexpr auto PwIdAny = PW_ID_ANY;
 DIAGNOSTIC_POP;
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import alstring;
 import backends.exception;
-import common.std;
 import core.device;
 import core.helpers;
 import filesystem;
@@ -140,8 +139,13 @@ import numeric;
 import ringbuffer;
 import spanstream;
 import zstring_view;
+
 #else
+
+#include <algorithm>
+#include <thread>
 #include <utility>
+
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alformatzsv.hpp"

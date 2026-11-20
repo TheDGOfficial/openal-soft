@@ -59,7 +59,6 @@
 
 #include "pffft.h"
 
-#include <algorithm>
 #include <array>
 #include <bit>
 #include <cmath>
@@ -73,18 +72,24 @@
 
 #include "opthelper_macros.hpp"
 #include "pragmadefs.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
 import common.std;
+
 import fmtlib;
 import gsl;
+import zudl;
 #include "gsl_macros.hpp"
+
 #else
+
+#include <algorithm>
 #include <utility>
+
 #include "fmt/format.h"
 #include "fmt/ranges.h"
 #include "gsl/gsl"
+#include "zudl.hpp"
 #endif
 
 namespace {

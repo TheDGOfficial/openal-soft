@@ -1,24 +1,35 @@
 
 #include "config.h"
 
-#include "AL/al.h"
-#include "AL/efx.h"
+#include <string_view>
 
 #include "effects.h"
 
 #if ALSOFT_EAX
-#include "al/eax/effect.h"
 #if HAVE_CXXMODULES
+import eax.call;
+import eax.effect;
 import eax.exception;
+
 #else
+
+#include "al/eax/call.hpp"
+#include "al/eax/effect.hpp"
 #include "al/eax/exception.hpp"
 #endif
 #endif // ALSOFT_EAX
 
 #if HAVE_CXXMODULES
+import openal;
+
 import alc.context;
 import numeric;
+
 #else
+
+#include "AL/al.h"
+#include "AL/efx.h"
+
 #include "alc/context.hpp"
 #include "numeric.hpp"
 #endif

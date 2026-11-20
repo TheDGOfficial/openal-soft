@@ -3,7 +3,6 @@
 
 #include "ambdec.h"
 
-#include <algorithm>
 #include <bit>
 #include <cctype>
 #include <cmath>
@@ -12,23 +11,28 @@
 #include <span>
 #include <string>
 
-#include "zudl.hpp"
-
 #if HAVE_CXXMODULES
-import alstring;
 import common.std;
+
+import alstring;
 import filesystem;
 import format;
 import gsl;
 import numeric;
+import zudl;
+
 #else
+
+#include <algorithm>
 #include <istream>
 #include <sstream>
+
 #include "alformat.hpp"
 #include "alstring.h"
 #include "filesystem.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 namespace {

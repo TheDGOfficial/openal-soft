@@ -55,9 +55,9 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <array>
 #include <bit>
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -69,7 +69,6 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <variant>
 #include <vector>
 
@@ -82,7 +81,6 @@
 #endif
 
 #include "opthelpers.h"
-#include "zudl.hpp"
 
 #include "win_main_utf8.h"
 
@@ -97,12 +95,15 @@ import fmtlib;
 import gsl;
 import numeric;
 import zstring_view;
+import zudl;
 
 #else
 
+#include <algorithm>
 #include <iostream>
 #include <source_location>
 #include <stdexcept>
+#include <thread>
 #include <utility>
 
 #include "AL/alc.h"
@@ -119,6 +120,7 @@ import zstring_view;
 #include "fmt/std.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 namespace {

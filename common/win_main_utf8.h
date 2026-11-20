@@ -63,12 +63,9 @@ int my_main(int, char**);
 #define main my_main
 
 #ifdef __cplusplus
-#include <algorithm>
 #include <cstdlib>
 #include <span>
 #include <string>
-
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
 import common.std;
@@ -76,15 +73,18 @@ import common.std;
 import fmtlib;
 import gsl;
 import zstring_view;
+import zudl;
 
 #else
 
+#include <algorithm>
 #include <stdexcept>
 
 #include "fmt/base.h"
 #include "fmt/ostream.h"
 #include "gsl/gsl"
 #include "zstring_view.hpp"
+#include "zudl.hpp"
 #endif
 
 extern "C"

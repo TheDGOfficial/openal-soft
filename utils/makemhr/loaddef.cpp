@@ -25,7 +25,6 @@
 
 #include "loaddef.h"
 
-#include <algorithm>
 #include <bit>
 #include <cctype>
 #include <cmath>
@@ -41,7 +40,6 @@
 #include <string_view>
 #include <vector>
 
-#include "albit.h"
 #include "makemhr.h"
 #include "polyphase_resampler.h"
 #include "sofa-support.h"
@@ -49,16 +47,23 @@
 #include "mysofa.h"
 
 #if HAVE_CXXMODULES
-import alstring;
 import common.std;
+
+import alstring;
+import bit;
 import filesystem;
 import fmtlib;
 import gsl;
 #include "gsl_macros.hpp"
+
 #else
+
+#include <algorithm>
 #include <iostream>
 #include <utility>
+
 #include "alstring.h"
+#include "bit.hpp"
 #include "filesystem.h"
 #include "fmt/base.h"
 #include "fmt/ostream.h"

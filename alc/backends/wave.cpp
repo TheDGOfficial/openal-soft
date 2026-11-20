@@ -22,7 +22,6 @@
 
 #include "wave.hpp"
 
-#include <algorithm>
 #include <array>
 #include <atomic>
 #include <bit>
@@ -31,33 +30,39 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <exception>
 #include <functional>
 #include <system_error>
-#include <thread>
 #include <vector>
 
 #include "alc/alconfig.h"
 #include "althrd_setname.h"
 #include "core/ambidefs.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import alstring;
 import backends.exception;
-import common.std;
 import core.device;
 import filesystem;
 import gsl;
 import logging;
+import zudl;
+
 #else
+
+#include <algorithm>
+#include <exception>
 #include <ostream>
+#include <thread>
+
 #include "alc/backends/exception.hpp"
 #include "alstring.h"
 #include "core/device.h"
 #include "core/logging.h"
 #include "filesystem.h"
 #include "gsl/gsl"
+#include "zudl.hpp"
 #endif
 
 

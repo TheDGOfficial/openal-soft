@@ -2,7 +2,6 @@
 #include "config.h"
 #include "config_simd.h"
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <complex>
@@ -35,9 +34,10 @@
 #include "polyphase_resampler.h"
 #include "vecmat.h"
 #include "vector.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import core.ambi_utils;
 import core.buffer_storage;
 import core.context;
@@ -45,8 +45,13 @@ import core.device;
 import core.effectslot;
 import gsl;
 import numeric;
+import zudl;
 #include "gsl_macros.hpp"
+
 #else
+
+#include <algorithm>
+
 #include "core/ambi_utils.hpp"
 #include "core/buffer_storage.h"
 #include "core/context.h"
@@ -54,6 +59,7 @@ import numeric;
 #include "core/effectslot.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 

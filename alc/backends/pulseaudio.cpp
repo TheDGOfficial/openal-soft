@@ -23,7 +23,6 @@
 
 #include "pulseaudio.hpp"
 
-#include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
@@ -44,21 +43,26 @@
 #include "dynload.h"
 #include "envutils.hpp"
 #include "opthelpers.h"
-#include "zudl.hpp"
 
 #include <pulse/pulseaudio.h>
 
 #if HAVE_CXXMODULES
-import backends.exception;
 import common.std;
+
+import backends.exception;
 import core.device;
 import format;
 import gsl;
 import logging;
 import numeric;
 import zstring_view;
+import zudl;
+
 #else
+
+#include <algorithm>
 #include <utility>
+
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alformatzsv.hpp"
@@ -66,6 +70,7 @@ import zstring_view;
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 

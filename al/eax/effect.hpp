@@ -8,17 +8,17 @@
 #include "AL/al.h"
 #include "AL/alext.h"
 
+#include "al/eax/call.hpp"
 #include "api.h"
 #include "core/effects/base.h"
-#include "call.h"
 #include "opthelper_macros.hpp"
 
 inline bool EaxTraceCommits{false};
 
-struct EaxEffectErrorMessages {
-    static constexpr auto unknown_property_id() noexcept { return "Unknown property id."; }
-    static constexpr auto unknown_version() noexcept { return "Unknown version."; }
-}; // EaxEffectErrorMessages
+namespace EaxEffectErrorMessages {
+    constexpr auto unknown_property_id() noexcept { return "Unknown property id."; }
+    constexpr auto unknown_version() noexcept { return "Unknown version."; }
+}
 
 using EaxEffectProps = std::variant<std::monostate,
     EAXREVERBPROPERTIES,
@@ -360,7 +360,6 @@ public:
         al_effect_type_ = EnumFromEaxEffectType(props_);
         return ret;
     }
-#undef EAXCALL
 }; // EaxEffect
 
 #endif // !EAX_EFFECT_INCLUDED

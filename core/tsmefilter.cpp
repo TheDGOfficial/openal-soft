@@ -1,16 +1,26 @@
 
 #include "config.h"
 
-#include <algorithm>
-
-#include "allpass_conv.hpp"
 #include "tsmefilter.hpp"
-#include "zudl.hpp"
+
+#include <memory>
+
+#include "pffft.h"
 
 #if HAVE_CXXMODULES
+import common.std;
+
+import core.allpass_conv;
 import phase_shifter;
+import zudl;
+
 #else
+
+#include <algorithm>
+
+#include "core/allpass_conv.hpp"
 #include "phase_shifter.hpp"
+#include "zudl.hpp"
 #endif
 
 namespace {

@@ -20,7 +20,6 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <bit>
 #include <cstddef>
 #include <cstdint>
@@ -40,7 +39,6 @@
 #include "core/except.h"
 #include "direct_defs.h"
 #include "opthelpers.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
 import common.std;
@@ -53,7 +51,11 @@ import alstring;
 import gsl;
 import logging;
 import numeric;
+import zudl;
+
 #else
+
+#include <algorithm>
 #include <utility>
 
 #include "AL/al.h"
@@ -67,6 +69,7 @@ import numeric;
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 #include "AL/efx-presets.h"

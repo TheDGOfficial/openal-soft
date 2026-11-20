@@ -3,7 +3,6 @@
 
 #include "bformatdec.h"
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <ranges>
@@ -12,8 +11,18 @@
 #include "filters/splitter.h"
 #include "mixer.h"
 #include "opthelper_macros.hpp"
-#include "zudl.hpp"
 
+#if HAVE_CXXMODULES
+import common.std;
+
+import zudl;
+
+#else
+
+#include <algorithm>
+
+#include "zudl.hpp"
+#endif
 
 namespace {
 

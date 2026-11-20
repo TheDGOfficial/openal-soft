@@ -2,7 +2,6 @@
 #include "config.h"
 #include "config_simd.h"
 
-#include <algorithm>
 #include <array>
 #include <atomic>
 #include <cstdint>
@@ -28,11 +27,11 @@
 #include "opthelper_macros.hpp"
 #include "resampler_limits.hpp"
 #include "uhjfilter.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
-import alstring;
 import common.std;
+
+import alstring;
 import core.ambi_utils;
 import core.buffer_storage;
 import core.device;
@@ -40,9 +39,14 @@ import core.voice;
 import gsl;
 import logging;
 import numeric;
+import zudl;
 #include "gsl_macros.hpp"
+
 #else
+
+#include <algorithm>
 #include <utility>
+
 #include "alstring.h"
 #include "core/ambi_utils.hpp"
 #include "core/buffer_storage.h"
@@ -51,6 +55,7 @@ import numeric;
 #include "core/voice.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 

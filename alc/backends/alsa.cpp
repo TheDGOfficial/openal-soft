@@ -22,18 +22,15 @@
 
 #include "alsa.hpp"
 
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
-#include <exception>
 #include <memory>
 #include <mutex>
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <vector>
 
 #include "alc/alconfig.h"
@@ -44,8 +41,9 @@
 #include <alsa/asoundlib.h>
 
 #if HAVE_CXXMODULES
-import backends.exception;
 import common.std;
+
+import backends.exception;
 import core.device;
 import core.helpers;
 import format;
@@ -55,8 +53,14 @@ import logging;
 import numeric;
 import ringbuffer;
 import zstring_view;
+
 #else
+
+#include <algorithm>
+#include <exception>
+#include <thread>
 #include <utility>
+
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alformatzsv.hpp"

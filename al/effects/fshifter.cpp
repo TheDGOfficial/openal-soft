@@ -2,16 +2,23 @@
 #include "config.h"
 
 #include <optional>
+#include <string_view>
 
 #include "effects.h"
 #include "opthelpers.h"
 
 #if ALSOFT_EAX
-#include "al/eax/effect.h"
+#include "al/eax/api.h"
 #if HAVE_CXXMODULES
+import eax.call;
+import eax.effect;
 import eax.exception;
 import eax.validator;
+
 #else
+
+#include "al/eax/call.hpp"
+#include "al/eax/effect.hpp"
 #include "al/eax/exception.hpp"
 #include "al/eax/validator.hpp"
 #endif

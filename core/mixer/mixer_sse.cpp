@@ -3,7 +3,6 @@
 #include <mmintrin.h>
 #include <xmmintrin.h>
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <limits>
@@ -20,9 +19,17 @@
 #include "opthelper_macros.hpp"
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import gsl;
+import zudl;
+
 #else
+
+#include <algorithm>
+
 #include "gsl/gsl"
+#include "zudl.hpp"
 #endif
 
 

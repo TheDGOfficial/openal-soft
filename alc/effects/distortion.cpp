@@ -20,7 +20,6 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -34,21 +33,30 @@
 #include "alc/effects/base.h"
 #include "core/bufferline.h"
 #include "core/effects/base.h"
-#include "core/effectslot.h"
 #include "core/filters/biquad.h"
 #include "core/filters/splitter.h"
 #include "core/mixer.h"
+#include "core/mixparams.hpp"
 #include "intrusive_ptr.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import core.ambi_utils;
 import core.context;
 import core.device;
+import core.effectslot;
+import zudl;
+
 #else
+
+#include <algorithm>
+
 #include "core/ambi_utils.hpp"
 #include "core/context.h"
 #include "core/device.h"
+#include "core/effectslot.h"
+#include "zudl.hpp"
 #endif
 
 struct BufferStorage;

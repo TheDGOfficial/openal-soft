@@ -1,42 +1,55 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <span>
+#include <string_view>
 #include <variant>
 
-#include "AL/al.h"
-#include "AL/efx.h"
-
 #include "effects.h"
-#include "zudl.hpp"
 
 #if ALSOFT_EAX
 #include "al/eax/api.h"
-#include "al/eax/call.h"
-#include "al/eax/effect.h"
 #include "al/eax/presets.hpp"
 #if HAVE_CXXMODULES
+import eax.call;
+import eax.effect;
 import eax.exception;
 import eax.validator;
+
 #else
+
+#include "al/eax/call.hpp"
+#include "al/eax/effect.hpp"
 #include "al/eax/exception.hpp"
 #include "al/eax/validator.hpp"
 #endif
 #endif // ALSOFT_EAX
 
 #if HAVE_CXXMODULES
+import common.std;
+import openal;
+
 import alc.context;
 import logging;
 import gsl;
 import numeric;
+import zudl;
+#include "gsl_macros.hpp"
+
 #else
+
+#include <algorithm>
+
+#include "AL/al.h"
+#include "AL/efx.h"
+
 #include "alc/context.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 

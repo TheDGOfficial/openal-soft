@@ -25,7 +25,6 @@
 
 #include "loadsofa.h"
 
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cmath>
@@ -38,7 +37,6 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <vector>
 
 #include "makemhr.h"
@@ -49,9 +47,16 @@
 #include "numeric.hpp"
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import fmtlib;
 import gsl;
+
 #else
+
+#include <algorithm>
+#include <thread>
+
 #include "fmt/base.h"
 #include "fmt/ostream.h"
 #include "gsl/gsl"

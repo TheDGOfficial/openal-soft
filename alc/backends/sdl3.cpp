@@ -22,7 +22,6 @@
 
 #include "sdl3.hpp"
 
-#include <algorithm>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
@@ -34,7 +33,6 @@
 
 #include "opthelpers.h"
 #include "pragmadefs.h"
-#include "zudl.hpp"
 
 DIAGNOSTIC_PUSH
 std_pragma("GCC diagnostic ignored \"-Wold-style-cast\"")
@@ -49,16 +47,22 @@ constexpr auto DefaultCaptureDeviceID = SDL_AUDIO_DEVICE_DEFAULT_RECORDING;
 DIAGNOSTIC_POP;
 
 #if HAVE_CXXMODULES
-import backends.exception;
 import common.std;
+
+import backends.exception;
 import core.device;
 import format;
 import gsl;
 import logging;
 import numeric;
 import ringbuffer;
+import zudl;
+
 #else
+
+#include <algorithm>
 #include <utility>
+
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "core/device.h"
@@ -66,6 +70,7 @@ import ringbuffer;
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "ringbuffer.hpp"
+#include "zudl.hpp"
 #endif
 
 

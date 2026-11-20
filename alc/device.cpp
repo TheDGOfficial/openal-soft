@@ -5,7 +5,6 @@
 #include <windows.h>
 #endif
 
-#include <algorithm>
 #include <bit>
 #include <csignal>
 #include <variant>
@@ -15,15 +14,21 @@
 #include "core/hrtf.h"
 #include "core/mastering.h"
 #include "flexarray.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import al.iface;
 import alc.device;
 import gsl;
 import logging;
 import numeric;
+import zudl;
+
 #else
+
+#include <algorithm>
+
 #include "al/buffer.h"
 #include "al/effect.h"
 #include "al/filter.h"
@@ -31,6 +36,7 @@ import numeric;
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 

@@ -741,14 +741,13 @@ set(COMMON_SRCS
     common/polyphase_resampler.cpp
 )
 set(COMMON_HDRS
-    common/albit.h
     common/alcomplex.h
     common/alformat.hpp
     common/almalloc.h
     common/alstring.h
     common/althrd_setname.h
-    common/althreads.h
     common/atomic.h
+    common/bit.hpp
     common/bitset.hpp
     common/cemath.hpp
     common/comptr.h
@@ -773,6 +772,7 @@ set(COMMON_HDRS
     common/pragmadefs.h
     common/ringbuffer.hpp
     common/spanstream.hpp
+    common/tss.hpp
     common/vecmat.h
     common/vector.h
     common/zstring_view.hpp
@@ -795,6 +795,7 @@ if(HAVE_CXXMODULES)
         alsoft-modules/std.cppm
         common/alformat.cppm
         common/alstring.cppm
+        common/bit.cppm
         common/cemath.cppm
         common/filesystem.cppm
         common/hann_window.cppm
@@ -804,6 +805,7 @@ if(HAVE_CXXMODULES)
         common/ringbuffer.cppm
         common/spanstream.cppm
         common/zstring_view.cppm
+        common/zudl.cppm
     )
 else()
     list(APPEND COMMON_HDRS
@@ -890,6 +892,7 @@ set(CORE_HDRS
     core/voice_change.h)
 if(HAVE_CXXMODULES)
     list(APPEND CORE_MODS
+        core/allpass_conv.cppm
         core/ambi_utils.cppm
         core/bsinc_tables.cppm
         core/buffer_storage.cppm
@@ -1051,15 +1054,19 @@ if(ALSOFT_EAX)
     list(APPEND OPENAL_HDRS
         al/eax/alapi.hpp
         al/eax/api.h
-        al/eax/call.h
-        al/eax/effect.h
+        al/eax/call.hpp
+        al/eax/effect.hpp
         al/eax/fx_slot_index.h
         al/eax/fx_slots.h
         al/eax/globals.h
         al/eax/presets.hpp
     )
     if(HAVE_CXXMODULES)
-        list(APPEND CORE_MODS al/eax/exception.cppm al/eax/validator.cppm)
+        list(APPEND CORE_MODS
+            al/eax/call.cppm
+            al/eax/effect.cppm
+            al/eax/exception.cppm
+            al/eax/validator.cppm)
     else()
         list(APPEND OPENAL_HDRS al/eax/exception.hpp al/eax/validator.hpp)
     endif()

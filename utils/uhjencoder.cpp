@@ -24,7 +24,6 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -36,13 +35,14 @@
 #include <vector>
 
 #include "vector.h"
-#include "zudl.hpp"
 
 #include "sndfile.h"
 
 #include "win_main_utf8.h"
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import alstring;
 import filesystem;
 import fmtlib;
@@ -50,7 +50,12 @@ import gsl;
 import numeric;
 import phase_shifter;
 import zstring_view;
+import zudl;
+
 #else
+
+#include <algorithm>
+
 #include "alformatzsv.hpp"
 #include "alstring.h"
 #include "filesystem.h"
@@ -61,6 +66,7 @@ import zstring_view;
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "phase_shifter.hpp"
+#include "zudl.hpp"
 #endif
 
 namespace {

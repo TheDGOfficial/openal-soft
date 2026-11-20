@@ -1,7 +1,6 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <bit>
 #include <iterator>
 #include <ranges>
@@ -12,7 +11,6 @@
 
 #include "hrtf.h"
 #include "opthelpers.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
 import common.std;
@@ -23,10 +21,12 @@ import gsl;
 import hrtfstore;
 import logging;
 import numeric;
+import zudl;
 #include "gsl_macros.hpp"
 
 #else
 
+#include <algorithm>
 #include <istream>
 #include <stdexcept>
 
@@ -37,6 +37,7 @@ import numeric;
 #include "gsl/gsl"
 #include "logging.h"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 

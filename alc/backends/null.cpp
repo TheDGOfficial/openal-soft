@@ -22,19 +22,24 @@
 
 #include "null.hpp"
 
-#include <exception>
 #include <atomic>
 #include <chrono>
 #include <cstdint>
-#include <thread>
 
 #include "althrd_setname.h"
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import backends.exception;
 import core.device;
 import core.helpers;
+
 #else
+
+#include <exception>
+#include <thread>
+
 #include "alc/backends/exception.hpp"
 #include "core/device.h"
 #include "core/helpers.hpp"

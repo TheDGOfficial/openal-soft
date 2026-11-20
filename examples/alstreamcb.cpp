@@ -26,7 +26,6 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstddef>
@@ -34,13 +33,10 @@
 #include <memory>
 #include <ranges>
 #include <span>
-#include <thread>
 #include <variant>
 #include <vector>
 
 #include "sndfile.h"
-
-#include "zudl.hpp"
 
 #include "win_main_utf8.h"
 
@@ -53,11 +49,14 @@ import fmtlib;
 import gsl;
 import numeric;
 import zstring_view;
+import zudl;
 
 #else
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
+#include <thread>
 
 #include "AL/al.h"
 #include "AL/alc.h"
@@ -69,6 +68,7 @@ import zstring_view;
 #include "fmt/ostream.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 

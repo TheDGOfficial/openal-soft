@@ -20,7 +20,6 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <bit>
 #include <cstdint>
 #include <iterator>
@@ -43,17 +42,18 @@
 #include "direct_defs.h"
 #include "flexarray.h"
 #include "opthelpers.h"
-#include "zudl.hpp"
 
 #if ALSOFT_EAX
 #include "eax/api.h"
-#include "eax/call.h"
-#include "eax/effect.h"
 #include "eax/fx_slot_index.h"
 #if HAVE_CXXMODULES
+import eax.call;
+import eax.effect;
 import eax.exception;
 import eax.validator;
 #else
+#include "al/eax/call.hpp"
+#include "eax/effect.hpp"
 #include "eax/exception.hpp"
 #include "eax/validator.hpp"
 #endif
@@ -70,9 +70,11 @@ import format;
 import gsl;
 import logging;
 import numeric;
+import zudl;
 
 #else
 
+#include <algorithm>
 #include <stdexcept>
 
 #include "AL/al.h"
@@ -88,6 +90,7 @@ import numeric;
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 namespace {
@@ -1371,10 +1374,9 @@ void al::EffectSlot::eax5_fx_slot_set_all(const EaxCall& call)
 
 auto al::EffectSlot::eax_fx_slot_should_update_sources() const noexcept -> bool
 {
-    static constexpr auto dirty_bits = al::bitset<EaxEffectSlotDirtyBit>{}
-        .set(EaxEffectSlotDirtyBit::Occlusion)
-        .set(EaxEffectSlotDirtyBit::OcclusionLfRatio)
-        .set(EaxEffectSlotDirtyBit::Flags);
+    static auto constexpr dirty_bits = al::bitset<EaxEffectSlotDirtyBit>{
+        EaxEffectSlotDirtyBit::Occlusion, EaxEffectSlotDirtyBit::OcclusionLfRatio,
+        EaxEffectSlotDirtyBit::Flags};
     return (mEaxDf & dirty_bits).any();
 }
 

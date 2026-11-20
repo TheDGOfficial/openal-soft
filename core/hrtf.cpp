@@ -3,7 +3,6 @@
 
 #include "hrtf.h"
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -28,11 +27,11 @@
 #include "mixer/hrtfdefs.h"
 #include "opthelpers.h"
 #include "polyphase_resampler.h"
-#include "zudl.hpp"
 
 #if HAVE_CXXMODULES
-import alstring;
 import common.std;
+
+import alstring;
 import core.ambi_utils;
 import core.helpers;
 import filesystem;
@@ -42,10 +41,15 @@ import hrtfstore;
 import logging;
 import numeric;
 import spanstream;
+import zudl;
 #include "gsl_macros.hpp"
+
 #else
+
+#include <algorithm>
 #include <istream>
 #include <utility>
+
 #include "alformat.hpp"
 #include "alformatpath.hpp"
 #include "alstring.h"
@@ -57,6 +61,7 @@ import spanstream;
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "spanstream.hpp"
+#include "zudl.hpp"
 #endif
 
 

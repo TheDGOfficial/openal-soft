@@ -4,7 +4,6 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <array>
 #include <atomic>
 #include <bit>
@@ -26,13 +25,11 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <variant>
 #include <vector>
 
 #include "opthelpers.h"
 #include "pragmadefs.h"
-#include "zudl.hpp"
 
 DIAGNOSTIC_PUSH
 std_pragma("GCC diagnostic ignored \"-Wconversion\"")
@@ -63,21 +60,25 @@ struct SwsContext;
 #include "SDL3/SDL_video.h"
 
 #if HAVE_CXXMODULES
+import common.std;
+import openal;
+
 import alhelpers;
 import alstring;
-import common.std;
 import fmtlib;
 import gsl;
 import inout_ptr;
 import numeric;
-import openal;
 import zstring_view;
+import zudl;
 
 /* AL_APIENTRY is needed, but not exported from the module. */
 #include "openal_apientry.h"
 
 #else
 
+#include <algorithm>
+#include <thread>
 #include <utility>
 
 #include "AL/al.h"
@@ -92,6 +93,7 @@ import zstring_view;
 #include "gsl/gsl"
 #include "inout_ptr.hpp"
 #include "numeric.hpp"
+#include "zudl.hpp"
 #endif
 
 

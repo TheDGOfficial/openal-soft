@@ -1,7 +1,6 @@
 
 #include "config.h"
 
-#include <algorithm>
 #include <array>
 #include <bit>
 #include <functional>
@@ -16,35 +15,39 @@
 #include "flexarray.h"
 #include "intrusive_ptr.h"
 #include "vecmat.h"
-#include "zudl.hpp"
 
 #if ALSOFT_EAX
-#include <compare>
-
 #include "al/eax/api.h"
-#include "al/eax/call.h"
 #include "al/eax/globals.h"
 #if HAVE_CXXMODULES
+import eax.call;
 import eax.exception;
 import eax.validator;
 #else
+#include "al/eax/call.hpp"
 #include "al/eax/exception.hpp"
 #include "al/eax/validator.hpp"
 #endif
 #endif // ALSOFT_EAX
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import al.iface;
 import alc.context;
 import alc.device;
-import common.std;
 import fmtlib;
 import gsl;
 import logging;
 import numeric;
 import ringbuffer;
+import zudl;
+
 #else
+
+#include <algorithm>
 #include <utility>
+
 #include "al/auxeffectslot.h"
 #include "al/debug.h"
 #include "al/effect.h"
@@ -59,6 +62,7 @@ import ringbuffer;
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "ringbuffer.hpp"
+#include "zudl.hpp"
 #endif
 
 namespace {
