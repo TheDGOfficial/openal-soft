@@ -20,11 +20,8 @@
 
 #include "config.h"
 
-#include <array>
-#include <cmath>
 #include <cstdint>
 #include <functional>
-#include <numbers>
 #include <ranges>
 #include <span>
 #include <variant>
@@ -50,6 +47,9 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <numbers>
 
 #include "core/context.h"
 #include "core/device.h"

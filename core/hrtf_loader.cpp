@@ -10,17 +10,17 @@
 #include "hrtf_loader.hpp"
 
 #include "hrtf.h"
-#include "opthelpers.h"
 
 #if HAVE_CXXMODULES
 import common.std;
 
+import core.hrtfstore;
+import core.logging;
 import fmtlib;
 import format;
 import gsl;
-import hrtfstore;
-import logging;
 import numeric;
+import opthelpers;
 import zudl;
 #include "gsl_macros.hpp"
 
@@ -37,6 +37,7 @@ import zudl;
 #include "gsl/gsl"
 #include "logging.h"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

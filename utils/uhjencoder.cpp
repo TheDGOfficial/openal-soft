@@ -24,12 +24,9 @@
 
 #include "config.h"
 
-#include <array>
-#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <memory>
-#include <numbers>
 #include <ranges>
 #include <span>
 #include <vector>
@@ -55,6 +52,9 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <numbers>
 
 #include "alformatzsv.hpp"
 #include "alstring.h"

@@ -20,12 +20,10 @@
 
 #include "config.h"
 
-#include <array>
 #include <atomic>
 #include <bit>
 #include <bitset>
 #include <chrono>
-#include <cmath>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
@@ -34,30 +32,22 @@
 #include <functional>
 #include <limits>
 #include <memory>
-#include <mutex>
-#include <new>
-#include <optional>
 #include <ranges>
 #include <span>
-#include <string>
 #include <string_view>
-#include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
 
-#include "alc/backends/base.hpp"
 #include "alc/inprogext.h"
 #include "almalloc.h"
 #include "atomic.h"
-#include "core/except.h"
 #include "core/mixer/defs.h"
 #include "core/storage_formats.h"
 #include "core/voice_change.h"
 #include "direct_defs.h"
 #include "flexarray.h"
 #include "intrusive_ptr.h"
-#include "opthelpers.h"
 
 #if ALSOFT_EAX
 #include "eax/api.h"
@@ -80,18 +70,28 @@ import openal;
 import al.iface;
 import alc.context;
 import alc.device;
+import backends.base;
+import core.except;
+import core.logging;
 import core.voice;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import zudl;
 #include "gsl_macros.hpp"
 
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <mutex>
+#include <new>
+#include <optional>
 #include <stdexcept>
+#include <string>
+#include <tuple>
 #include <utility>
 
 #include "AL/al.h"
@@ -103,13 +103,16 @@ import zudl;
 #include "al/debug.h"
 #include "al/filter.h"
 #include "al/source.h"
+#include "alc/backends/base.hpp"
 #include "alc/context.hpp"
 #include "alc/device.h"
 #include "alformat.hpp"
+#include "core/except.hpp"
 #include "core/logging.h"
 #include "core/voice.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

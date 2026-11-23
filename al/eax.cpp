@@ -2,7 +2,6 @@
 #include "config.h"
 
 #include <cstring>
-#include <mutex>
 #include <string_view>
 #if defined(_WIN32)
 #include <guiddef.h>
@@ -18,13 +17,14 @@ import openal;
 #include "openal_apientry.h"
 
 import alc.context;
+import core.logging;
 import eax.exception;
 import gsl;
-import logging;
 
 #else
 
 #include <exception>
+#include <mutex>
 
 #include "AL/al.h"
 #include "AL/alc.h"

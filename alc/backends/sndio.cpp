@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include "sndio.hpp"
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -30,6 +28,7 @@
 #include <system_error>
 #include <vector>
 
+#include "alc/events.h"
 #include "althrd_setname.h"
 
 #include <sndio.h>
@@ -37,17 +36,19 @@
 #if HAVE_CXXMODULES
 import common.std;
 
+import backends.base;
 import backends.exception;
 import core.device;
 import core.helpers;
+import core.logging;
 import gsl;
-import logging;
 import ringbuffer;
 
 #else
 
 #include <thread>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "core/device.h"
 #include "core/helpers.hpp"
@@ -517,6 +518,10 @@ auto SndIOBackendFactory::init() -> bool
 
 auto SndIOBackendFactory::querySupport(BackendType const type) -> bool
 { return (type == BackendType::Playback || type == BackendType::Capture); }
+
+auto SndIOBackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto SndIOBackendFactory::enumerate(BackendType const type) -> std::vector<std::string>
 {

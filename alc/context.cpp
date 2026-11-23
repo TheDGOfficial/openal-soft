@@ -1,14 +1,11 @@
 
 #include "config.h"
 
-#include <array>
 #include <bit>
 #include <functional>
-#include <optional>
 #include <string_view>
 
 #include "alc/alu.h"
-#include "alc/backends/base.hpp"
 #include "atomic.h"
 #include "core/async_event.h"
 #include "core/voice_change.h"
@@ -32,13 +29,15 @@ import eax.validator;
 
 #if HAVE_CXXMODULES
 import common.std;
+import openal;
 
 import al.iface;
 import alc.context;
 import alc.device;
+import backends.base;
+import core.logging;
 import fmtlib;
 import gsl;
-import logging;
 import numeric;
 import ringbuffer;
 import zudl;
@@ -46,7 +45,13 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <optional>
 #include <utility>
+
+#include "AL/alc.h"
+#include "AL/al.h"
+#include "AL/alext.h"
 
 #include "al/auxeffectslot.h"
 #include "al/debug.h"
@@ -54,6 +59,7 @@ import zudl;
 #include "al/event.h"
 #include "al/listener.h"
 #include "al/source.h"
+#include "alc/backends/base.hpp"
 #include "alc/context.hpp"
 #include "alc/device.h"
 #include "core/logging.h"

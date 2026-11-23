@@ -2,15 +2,12 @@
 #include "config.h"
 #include "config_simd.h"
 
-#include <array>
-#include <cmath>
 #include <complex>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <iterator>
 #include <memory>
-#include <numbers>
 #include <ranges>
 #include <span>
 #include <vector>
@@ -51,6 +48,9 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <numbers>
 
 #include "core/ambi_utils.hpp"
 #include "core/buffer_storage.h"

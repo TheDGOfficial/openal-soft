@@ -20,12 +20,9 @@
 
 #include "config.h"
 
-#include <cmath>
-#include <mutex>
 #include <ranges>
 #include <span>
 
-#include "core/except.h"
 #include "direct_defs.h"
 
 #if HAVE_CXXMODULES
@@ -35,20 +32,24 @@ import openal;
 
 import al.iface;
 import alc.context;
+import core.except;
+import core.logging;
 import gsl;
-import logging;
 import numeric;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <cmath>
+#include <mutex>
 
 #include "AL/al.h"
 #include "AL/alext.h"
 
 #include "al/listener.h"
 #include "alc/context.hpp"
+#include "core/except.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"

@@ -24,11 +24,8 @@
 #include <cstdint>
 #include <iterator>
 #include <memory>
-#include <mutex>
-#include <new>
 #include <ranges>
 #include <span>
-#include <tuple>
 #include <unordered_map>
 #include <vector>
 
@@ -37,11 +34,9 @@
 #include "alc/inprogext.h"
 #include "almalloc.h"
 #include "atomic.h"
-#include "core/except.h"
 #include "core/fpu_ctrl.h"
 #include "direct_defs.h"
 #include "flexarray.h"
-#include "opthelpers.h"
 
 #if ALSOFT_EAX
 #include "eax/api.h"
@@ -66,16 +61,21 @@ import openal;
 import al.iface;
 import alc.context;
 import alc.device;
+import core.except;
+import core.logging;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <mutex>
+#include <new>
 #include <stdexcept>
+#include <tuple>
 
 #include "AL/al.h"
 #include "AL/alext.h"
@@ -87,9 +87,11 @@ import zudl;
 #include "alc/context.hpp"
 #include "alc/device.h"
 #include "alformat.hpp"
+#include "core/except.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

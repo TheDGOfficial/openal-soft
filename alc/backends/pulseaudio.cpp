@@ -21,55 +21,58 @@
 
 #include "config.h"
 
-#include "pulseaudio.hpp"
-
-#include <array>
 #include <atomic>
 #include <chrono>
-#include <cmath>
 #include <concepts>
 #include <cstring>
 #include <limits>
-#include <mutex>
-#include <optional>
 #include <ranges>
 #include <span>
-#include <string>
 #include <string_view>
 #include <vector>
 
 #include "alc/alconfig.h"
+#include "alc/events.h"
 #include "dlopennote.h"
 #include "dynload.h"
-#include "envutils.hpp"
-#include "opthelpers.h"
 
 #include <pulse/pulseaudio.h>
 
 #if HAVE_CXXMODULES
 import common.std;
 
+import backends.base;
 import backends.exception;
 import core.device;
+import core.logging;
+import envutils;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import zstring_view;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <mutex>
+#include <optional>
+#include <string>
 #include <utility>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alformatzsv.hpp"
 #include "core/device.h"
 #include "core/logging.h"
+#include "envutils.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

@@ -1,22 +1,16 @@
 #include "config.h"
 
-#include <array>
 #include <atomic>
 #include <cstdint>
 #include <cstring>
 #include <deque>
 #include <functional>
-#include <mutex>
-#include <optional>
 #include <ranges>
 #include <span>
-#include <string>
 #include <string_view>
 #include <unordered_map>
 
-#include "core/except.h"
 #include "direct_defs.h"
-#include "opthelpers.h"
 
 #if HAVE_CXXMODULES
 import common.std;
@@ -26,17 +20,23 @@ import openal;
 import al.iface;
 import alc.context;
 import alc.device;
+import core.except;
+import core.logging;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import zstring_view;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <array>
+#include <mutex>
+#include <optional>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 #include "AL/al.h"
@@ -52,9 +52,11 @@ import zudl;
 #include "alc/device.h"
 #include "alformat.hpp"
 #include "alformatzsv.hpp"
+#include "core/except.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

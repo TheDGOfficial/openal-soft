@@ -3,10 +3,7 @@
 
 #include "polyphase_resampler.h"
 
-#include <cmath>
-#include <numbers>
 #include <ranges>
-#include <tuple>
 
 #if HAVE_CXXMODULES
 import common.std;
@@ -17,7 +14,10 @@ import numeric;
 #else
 
 #include <algorithm>
+#include <cmath>
+#include <numbers>
 #include <stdexcept>
+#include <tuple>
 
 #include "gsl/gsl"
 #include "numeric.hpp"

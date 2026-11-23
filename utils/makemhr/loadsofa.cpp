@@ -27,15 +27,12 @@
 
 #include <atomic>
 #include <chrono>
-#include <cmath>
 #include <functional>
 #include <future>
 #include <iostream>
 #include <iterator>
 #include <memory>
-#include <optional>
 #include <span>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -55,6 +52,9 @@ import gsl;
 #else
 
 #include <algorithm>
+#include <cmath>
+#include <optional>
+#include <string>
 #include <thread>
 
 #include "fmt/base.h"

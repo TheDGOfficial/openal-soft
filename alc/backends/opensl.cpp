@@ -21,25 +21,20 @@
 
 #include "config.h"
 
-#include "opensl.hpp"
-
 #include <jni.h>
 
-#include <array>
 #include <bit>
 #include <cstdlib>
 #include <cstring>
 #include <iterator>
 #include <memory>
-#include <mutex>
-#include <new>
 #include <ranges>
 #include <functional>
 
+#include "alc/events.h"
 #include "althrd_setname.h"
 #include "dlopennote.h"
 #include "dynload.h"
-#include "opthelpers.h"
 
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
@@ -48,25 +43,32 @@
 #if HAVE_CXXMODULES
 import common.std;
 
+import backends.base;
 import backends.exception;
 import core.device;
 import core.helpers;
+import core.logging;
 import gsl;
-import logging;
+import opthelpers;
 import ringbuffer;
 import zstring_view;
 import zudl;
 
 #else
 
+#include <array>
+#include <mutex>
+#include <new>
 #include <thread>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alformatzsv.hpp"
 #include "core/device.h"
 #include "core/helpers.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"
+#include "opthelpers.hpp"
 #include "ringbuffer.hpp"
 #include "zudl.hpp"
 #endif
@@ -985,6 +987,10 @@ auto OSLBackendFactory::init() -> bool
 
 auto OSLBackendFactory::querySupport(BackendType const type) -> bool
 { return (type == BackendType::Playback || type == BackendType::Capture); }
+
+auto OSLBackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto OSLBackendFactory::enumerate(BackendType const type) -> std::vector<std::string>
 {

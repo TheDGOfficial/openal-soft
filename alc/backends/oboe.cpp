@@ -1,21 +1,25 @@
 
 #include "config.h"
 
-#include "oboe.hpp"
-
 #include <cstring>
+
+#include "alc/events.h"
 
 #include "oboe/Oboe.h"
 
 #if HAVE_CXXMODULES
 import alstring;
+import backends.base;
 import backends.exception;
 import core.device;
+import core.logging;
 import gsl;
-import logging;
 import numeric;
 import ringbuffer;
+
 #else
+
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alstring.h"
 #include "core/device.h"
@@ -374,6 +378,10 @@ auto OboeBackendFactory::init() -> bool { return true; }
 
 auto OboeBackendFactory::querySupport(BackendType const type) -> bool
 { return type == BackendType::Playback || type == BackendType::Capture; }
+
+auto OboeBackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto OboeBackendFactory::enumerate(BackendType const type) -> std::vector<std::string>
 {

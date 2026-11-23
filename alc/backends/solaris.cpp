@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include "solaris.hpp"
-
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -41,6 +39,7 @@
 #include <functional>
 
 #include "alc/alconfig.h"
+#include "alc/events.h"
 #include "althrd_setname.h"
 
 #include <sys/audioio.h>
@@ -49,16 +48,18 @@
 import common.std;
 
 import alstring;
+import backends.base;
 import backends.exception;
 import core.device;
 import core.helpers;
+import core.logging;
 import gsl;
-import logging;
 
 #else
 
 #include <thread>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alstring.h"
 #include "core/device.h"
@@ -291,6 +292,10 @@ auto SolarisBackendFactory::init() -> bool
 
 auto SolarisBackendFactory::querySupport(BackendType const type) -> bool
 { return type == BackendType::Playback; }
+
+auto SolarisBackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto SolarisBackendFactory::enumerate(BackendType const type) -> std::vector<std::string>
 {

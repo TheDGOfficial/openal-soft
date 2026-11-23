@@ -22,23 +22,17 @@
 
 #include "version.h"
 
-#include <array>
 #include <atomic>
-#include <cmath>
 #include <cstdint>
 #include <deque>
 #include <mutex>
-#include <optional>
-#include <string>
 
 #include "alc/alu.h"
 #include "alc/inprogext.h"
 #include "atomic.h"
 #include "core/mixer/defs.h"
 #include "direct_defs.h"
-#include "envutils.hpp"
 #include "intrusive_ptr.h"
-#include "opthelpers.h"
 
 #if ALSOFT_EAX
 #include "eax/alapi.hpp"
@@ -52,16 +46,22 @@ import openal;
 import al.iface;
 import alc.context;
 import alc.device;
+import core.logging;
 import core.voice;
+import envutils;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import zudl;
 
 #else
 
+#include <array>
+#include <cmath>
+#include <optional>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 #include "AL/al.h"
@@ -75,8 +75,10 @@ import zudl;
 #include "alformat.hpp"
 #include "core/logging.h"
 #include "core/voice.h"
+#include "envutils.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

@@ -25,17 +25,13 @@
 #include <cstdint>
 #include <iterator>
 #include <memory>
-#include <mutex>
-#include <new>
 #include <ranges>
 #include <unordered_map>
 #include <variant>
 #include <vector>
 
 #include "almalloc.h"
-#include "core/except.h"
 #include "direct_defs.h"
-#include "opthelpers.h"
 
 #if HAVE_CXXMODULES
 import common.std;
@@ -45,14 +41,18 @@ import openal;
 import al.iface;
 import alc.context;
 import alc.device;
+import core.except;
+import core.logging;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <mutex>
+#include <new>
 
 #include "AL/al.h"
 #include "AL/alext.h"
@@ -60,9 +60,11 @@ import zudl;
 #include "al/filter.h"
 #include "alc/context.hpp"
 #include "alc/device.h"
+#include "core/except.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

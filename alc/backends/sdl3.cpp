@@ -20,18 +20,15 @@
 
 #include "config.h"
 
-#include "sdl3.hpp"
-
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <ranges>
 #include <span>
-#include <string>
 #include <string_view>
 
-#include "opthelpers.h"
+#include "alc/events.h"
 #include "pragmadefs.h"
 
 DIAGNOSTIC_PUSH
@@ -49,26 +46,31 @@ DIAGNOSTIC_POP;
 #if HAVE_CXXMODULES
 import common.std;
 
+import backends.base;
 import backends.exception;
 import core.device;
+import core.logging;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import ringbuffer;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <string>
 #include <utility>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "core/device.h"
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "ringbuffer.hpp"
 #include "zudl.hpp"
 #endif

@@ -371,12 +371,14 @@ if(MSVC)
     if(HAVE_PERMISSIVE_SWITCH)
         list(APPEND C_FLAGS $<$<COMPILE_LANGUAGE:CXX>:/permissive->)
     endif()
+    # C4116 - unnamed type definition in parentheses
     # C4127 - conditional expression is constant
     # C4324 - structure was padded due to alignment specifier
     # C4373 - virtual function overrides 'base_function', previous versions of
     #         the compiler did not override when parameters only differed by
     #         const/volatile qualifiers
-    list(APPEND C_FLAGS /W4 /wd4127 /wd4324 /wd4373 /utf-8 $<$<COMPILE_LANGUAGE:CXX>:/EHsc>)
+    list(APPEND C_FLAGS /W4 $<$<COMPILE_LANGUAGE:C>:/wd4116> /wd4127 /wd4324 /wd4373 /utf-8
+        $<$<COMPILE_LANGUAGE:CXX>:/EHsc>)
 
     if(NOT DXSDK_DIR)
         string(REGEX REPLACE "\\\\" "/" DXSDK_DIR "$ENV{DXSDK_DIR}")
@@ -754,7 +756,6 @@ set(COMMON_HDRS
     common/disable_alloc.hpp
     common/dynload.h
     common/dlopennote.h
-    common/envutils.hpp
     common/expected.hpp
     common/filesystem.h
     common/flexarray.h
@@ -766,7 +767,7 @@ set(COMMON_HDRS
     common/numeric.hpp
     common/openal_apientry.h
     common/opthelper_macros.hpp
-    common/opthelpers.h
+    common/opthelpers.hpp
     common/pffft.h
     common/polyphase_resampler.h
     common/pragmadefs.h
@@ -797,10 +798,12 @@ if(HAVE_CXXMODULES)
         common/alstring.cppm
         common/bit.cppm
         common/cemath.cppm
+        common/envutils.cppm
         common/filesystem.cppm
         common/hann_window.cppm
         common/inout_ptr.cppm
         common/numeric.cppm
+        common/opthelpers.cppm
         common/phase_shifter.cppm
         common/ringbuffer.cppm
         common/spanstream.cppm
@@ -811,6 +814,7 @@ else()
     list(APPEND COMMON_HDRS
         common/alformatpath.hpp
         common/alformatzsv.hpp
+        common/envutils.hpp
         common/hann_window.hpp
         common/phase_shifter.hpp
     )
@@ -829,7 +833,6 @@ set(CORE_SRCS
     core/devformat.cpp
     core/device.cpp
     core/effectslot.cpp
-    core/except.cpp
     core/filters/biquad.cpp
     core/filters/nfc.cpp
     core/filters/splitter.cpp
@@ -871,7 +874,6 @@ set(CORE_HDRS
     core/effects/base.h
     core/effectslot.h
     core/encoderbase.hpp
-    core/except.h
     core/filters/biquad.h
     core/filters/nfc.h
     core/filters/splitter.h
@@ -900,12 +902,14 @@ if(HAVE_CXXMODULES)
         core/cubic_tables.cppm
         core/device.cppm
         core/effectslot.cppm
+        core/except.cppm
         core/helpers.cppm
         core/hrtfstore.cppm
         core/logging.cppm
         core/voice.cppm)
 else()
     list(APPEND CORE_HDRS
+        core/except.hpp
         core/helpers.hpp
         core/hrtfstore.hpp
         core/logging.h)
@@ -1126,7 +1130,7 @@ endif()
 
 set(BACKENDS "")
 if(HAVE_CXXMODULES)
-    list(APPEND CORE_MODS alc/backends/exception.cppm)
+    list(APPEND CORE_MODS alc/backends/base.cppm alc/backends/exception.cppm)
 else()
     list(APPEND ALC_HDRS alc/backends/exception.hpp)
 endif()
@@ -1138,8 +1142,6 @@ list(APPEND ALC_SRCS
 )
 list(APPEND ALC_HDRS
     alc/backends/base.hpp
-    alc/backends/loopback.hpp
-    alc/backends/null.hpp
 )
 
 # Check PipeWire backend
@@ -1151,7 +1153,6 @@ if(ALSOFT_BACKEND_PIPEWIRE AND PkgConfig_FOUND)
         set(HAVE_PIPEWIRE 1)
         set(BACKENDS  "${BACKENDS} PipeWire${IS_LINKED},")
         list(APPEND ALC_SRCS alc/backends/pipewire.cpp)
-        list(APPEND ALC_HDRS alc/backends/pipewire.hpp)
         add_backend_libs(${PIPEWIRE_LIBRARIES})
         list(APPEND INC_PATHS ${PIPEWIRE_INCLUDE_DIRS})
     endif()
@@ -1169,7 +1170,6 @@ if(ALSOFT_BACKEND_PULSEAUDIO)
         set(HAVE_PULSEAUDIO 1)
         set(BACKENDS  "${BACKENDS} PulseAudio${IS_LINKED},")
         list(APPEND ALC_SRCS alc/backends/pulseaudio.cpp)
-        list(APPEND ALC_HDRS alc/backends/pulseaudio.hpp)
         add_backend_libs(${PULSEAUDIO_LIBRARY})
         list(APPEND INC_PATHS ${PULSEAUDIO_INCLUDE_DIR})
     endif()
@@ -1188,7 +1188,6 @@ if(NOT WIN32)
             set(HAVE_ALSA 1)
             set(BACKENDS  "${BACKENDS} ALSA${IS_LINKED},")
             list(APPEND ALC_SRCS alc/backends/alsa.cpp)
-            list(APPEND ALC_HDRS alc/backends/alsa.hpp)
             add_backend_libs(${ALSA_LIBRARIES})
             list(APPEND INC_PATHS ${ALSA_INCLUDE_DIRS})
         endif()
@@ -1203,7 +1202,6 @@ if(NOT WIN32)
             set(HAVE_OSS 1)
             set(BACKENDS  "${BACKENDS} OSS,")
             list(APPEND ALC_SRCS alc/backends/oss.cpp)
-            list(APPEND ALC_HDRS alc/backends/oss.hpp)
             if(OSS_LIBRARIES)
                 list(APPEND EXTRA_LIBS ${OSS_LIBRARIES})
             endif()
@@ -1220,7 +1218,6 @@ if(NOT WIN32)
             set(HAVE_SOLARIS 1)
             set(BACKENDS  "${BACKENDS} Solaris,")
             list(APPEND ALC_SRCS alc/backends/solaris.cpp)
-            list(APPEND ALC_HDRS alc/backends/solaris.hpp)
             list(APPEND INC_PATHS ${AUDIOIO_INCLUDE_DIRS})
         endif()
     endif()
@@ -1238,7 +1235,6 @@ if(NOT WIN32)
             set(HAVE_SNDIO 1)
             set(BACKENDS  "${BACKENDS} SndIO (linked),")
             list(APPEND ALC_SRCS alc/backends/sndio.cpp)
-            list(APPEND ALC_HDRS alc/backends/sndio.hpp)
             list(APPEND EXTRA_LIBS ${SNDIO_LIBRARIES})
             list(APPEND INC_PATHS ${SNDIO_INCLUDE_DIRS})
         endif()
@@ -1268,7 +1264,6 @@ if(WIN32)
             set(HAVE_WASAPI 1)
             set(BACKENDS  "${BACKENDS} WASAPI,")
             list(APPEND ALC_SRCS alc/backends/wasapi.cpp)
-            list(APPEND ALC_HDRS alc/backends/wasapi.hpp)
             if(NOT ALSOFT_UWP)
                 list(APPEND EXTRA_LIBS avrt)
             endif()
@@ -1290,7 +1285,6 @@ if(WIN32)
                 set(HAVE_DSOUND 1)
                 set(BACKENDS "${BACKENDS} DirectSound,")
                 list(APPEND ALC_SRCS alc/backends/dsound.cpp)
-                list(APPEND ALC_HDRS alc/backends/dsound.hpp)
                 if(NOT HAVE_DSOUND_H)
                     list(APPEND INC_PATHS ${DSOUND_INCLUDE_DIR})
                 endif()
@@ -1304,7 +1298,6 @@ if(WIN32)
             set(HAVE_WINMM 1)
             set(BACKENDS "${BACKENDS} WinMM,")
             list(APPEND ALC_SRCS alc/backends/winmm.cpp)
-            list(APPEND ALC_HDRS alc/backends/winmm.hpp)
             # There doesn't seem to be good way to search for winmm.lib for MSVC.
             # find_library doesn't find it without being told to look in a specific
             # place in the WindowsSDK, but it links anyway. If there ends up being
@@ -1332,7 +1325,6 @@ if(ALSOFT_BACKEND_JACK)
         set(HAVE_JACK 1)
         set(BACKENDS  "${BACKENDS} JACK${IS_LINKED},")
         list(APPEND ALC_SRCS alc/backends/jack.cpp)
-        list(APPEND ALC_HDRS alc/backends/jack.hpp)
         add_backend_libs(${JACK_LIBRARIES})
         list(APPEND INC_PATHS ${JACK_INCLUDE_DIRS})
     endif()
@@ -1351,7 +1343,6 @@ if(ALSOFT_BACKEND_COREAUDIO)
         set(HAVE_COREAUDIO 1)
         set(BACKENDS  "${BACKENDS} CoreAudio,")
         list(APPEND ALC_SRCS alc/backends/coreaudio.cpp)
-        list(APPEND ALC_HDRS alc/backends/coreaudio.hpp)
 
         # Some versions of OSX may need the AudioToolbox framework. Add it if
         # it's found.
@@ -1402,7 +1393,6 @@ if(ALSOFT_BACKEND_OBOE)
         set(HAVE_OBOE 1)
         set(BACKENDS  "${BACKENDS} Oboe,")
         list(APPEND ALC_SRCS alc/backends/oboe.cpp)
-        list(APPEND ALC_HDRS alc/backends/oboe.hpp)
         list(APPEND EXTRA_LIBS ${OBOE_TARGET})
     endif()
 endif()
@@ -1419,7 +1409,6 @@ if(ALSOFT_BACKEND_OPENSL)
         set(HAVE_OPENSL 1)
         set(BACKENDS  "${BACKENDS} OpenSL${IS_LINKED},")
         list(APPEND ALC_SRCS alc/backends/opensl.cpp)
-        list(APPEND ALC_HDRS alc/backends/opensl.hpp)
         add_backend_libs(${OPENSL_LIBRARIES})
         list(APPEND INC_PATHS ${OPENSL_INCLUDE_DIRS})
     endif()
@@ -1437,7 +1426,6 @@ if(ALSOFT_BACKEND_PORTAUDIO)
         set(HAVE_PORTAUDIO 1)
         set(BACKENDS  "${BACKENDS} PortAudio${IS_LINKED},")
         list(APPEND ALC_SRCS alc/backends/portaudio.cpp)
-        list(APPEND ALC_HDRS alc/backends/portaudio.hpp)
         add_backend_libs(${PORTAUDIO_LIBRARIES})
         list(APPEND INC_PATHS ${PORTAUDIO_INCLUDE_DIRS})
     endif()
@@ -1456,7 +1444,6 @@ if(ALSOFT_BACKEND_SDL3)
         set(HAVE_SDL3 1)
         set(BACKENDS  "${BACKENDS} SDL3,")
         list(APPEND ALC_SRCS alc/backends/sdl3.cpp)
-        list(APPEND ALC_HDRS alc/backends/sdl3.hpp)
         list(APPEND EXTRA_LIBS SDL3::SDL3)
     else()
         message(STATUS "Could NOT find SDL3")
@@ -1474,7 +1461,6 @@ if(ALSOFT_BACKEND_SDL2 AND NOT HAVE_SDL3)
         set(HAVE_SDL2 1)
         set(BACKENDS  "${BACKENDS} SDL2,")
         list(APPEND ALC_SRCS alc/backends/sdl2.cpp)
-        list(APPEND ALC_HDRS alc/backends/sdl2.hpp)
         list(APPEND EXTRA_LIBS SDL2::SDL2)
     else()
         message(STATUS "Could NOT find SDL2")
@@ -1490,7 +1476,6 @@ if(ALSOFT_BACKEND_WAVE)
     set(HAVE_WAVE 1)
     set(BACKENDS  "${BACKENDS} WaveFile,")
     list(APPEND ALC_SRCS alc/backends/wave.cpp)
-    list(APPEND ALC_HDRS alc/backends/wave.hpp)
 endif()
 
 # This is always available

@@ -20,18 +20,13 @@
 
 #include "config.h"
 
-#include <array>
 #include <charconv>
 #include <chrono>
-#include <cmath>
 #include <cstdint>
 #include <iterator>
 #include <memory>
-#include <numbers>
-#include <optional>
 #include <ranges>
 #include <span>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -67,9 +62,9 @@ import alc.device;
 import alstring;
 import core.ambi_utils;
 import core.effectslot;
+import core.hrtfstore;
+import core.logging;
 import gsl;
-import hrtfstore;
-import logging;
 import numeric;
 import zudl;
 #include "gsl_macros.hpp"
@@ -77,6 +72,11 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <numbers>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include "AL/alext.h"

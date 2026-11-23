@@ -3,11 +3,8 @@
 
 #include "biquad.h"
 
-#include <array>
 #include <bit>
-#include <cmath>
 #include <cstddef>
-#include <numbers>
 #include <ranges>
 
 #include "opthelper_macros.hpp"
@@ -21,6 +18,9 @@ import numeric;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <numbers>
 
 #include "gsl/gsl"
 #include "numeric.hpp"

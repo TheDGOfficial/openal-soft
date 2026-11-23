@@ -25,10 +25,8 @@
 
 #include "bs2b.h"
 
-#include <cmath>
 #include <functional>
 #include <iterator>
-#include <numbers>
 #include <ranges>
 #include <span>
 
@@ -40,6 +38,8 @@ import gsl;
 #else
 
 #include <algorithm>
+#include <cmath>
+#include <numbers>
 #include <stdexcept>
 
 #include "gsl/gsl"

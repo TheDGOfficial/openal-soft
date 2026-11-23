@@ -24,7 +24,6 @@
 
 #include "config.h"
 
-#include <array>
 #include <bit>
 #include <cerrno>
 #include <cstddef>
@@ -32,7 +31,6 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <numbers>
 #include <ranges>
 #include <span>
 #include <system_error>
@@ -59,6 +57,8 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <numbers>
 
 #include "alformatzsv.hpp"
 #include "alstring.h"

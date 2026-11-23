@@ -3,11 +3,6 @@
 
 #include <cstdint>
 #include <functional>
-#include <mutex>
-#include <optional>
-#include <string>
-
-#include "envutils.hpp"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -16,21 +11,30 @@
 #endif
 
 #if HAVE_CXXMODULES
-import alstring;
 import common.std;
+
+import alstring;
+import core.logging;
+import envutils;
 import filesystem;
 import fmtlib;
 import format;
-import logging;
 import numeric;
 import zstring_view;
+
 #else
+
 #include <iostream>
+#include <mutex>
+#include <optional>
+#include <string>
 #include <utility>
+
 #include "alformat.hpp"
 #include "alformatpath.hpp"
 #include "alformatzsv.hpp"
 #include "alstring.h"
+#include "envutils.hpp"
 #include "filesystem.h"
 #include "fmt/std.h"
 #include "logging.h"

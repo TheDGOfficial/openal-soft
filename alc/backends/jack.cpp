@@ -20,36 +20,34 @@
 
 #include "config.h"
 
-#include "jack.hpp"
-
-#include <array>
 #include <bit>
 #include <cstring>
 #include <memory>
-#include <mutex>
 #include <ranges>
 #include <span>
 #include <vector>
 
 #include "alc/alconfig.h"
+#include "alc/events.h"
 #include "althrd_setname.h"
 #include "dlopennote.h"
 #include "dynload.h"
-#include "opthelpers.h"
 
 #include <jack/jack.h>
 
 #if HAVE_CXXMODULES
 import common.std;
 
+import backends.base;
 import backends.exception;
 import core.device;
 import core.helpers;
+import core.logging;
 import filesystem;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import ringbuffer;
 import zstring_view;
 import zudl;
@@ -57,8 +55,11 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <mutex>
 #include <thread>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alformatzsv.hpp"
@@ -68,6 +69,7 @@ import zudl;
 #include "filesystem.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "ringbuffer.hpp"
 #include "zudl.hpp"
 #endif
@@ -714,8 +716,12 @@ bool JackBackendFactory::init()
     return true;
 }
 
-bool JackBackendFactory::querySupport(BackendType type)
+auto JackBackendFactory::querySupport(BackendType const type) -> bool
 { return (type == BackendType::Playback); }
+
+auto JackBackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto JackBackendFactory::enumerate(BackendType type) -> std::vector<std::string>
 {

@@ -55,19 +55,15 @@
 
 #include "config.h"
 
-#include <array>
 #include <bit>
 #include <chrono>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <iterator>
 #include <memory>
-#include <numbers>
 #include <ranges>
 #include <span>
-#include <string>
 #include <string_view>
 #include <variant>
 #include <vector>
@@ -79,8 +75,6 @@
 #include <io.h>
 #include <fcntl.h>
 #endif
-
-#include "opthelpers.h"
 
 #include "win_main_utf8.h"
 
@@ -94,15 +88,20 @@ import filesystem;
 import fmtlib;
 import gsl;
 import numeric;
+import opthelpers;
 import zstring_view;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
 #include <iostream>
+#include <numbers>
 #include <source_location>
 #include <stdexcept>
+#include <string>
 #include <thread>
 #include <utility>
 
@@ -120,6 +119,7 @@ import zudl;
 #include "fmt/std.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

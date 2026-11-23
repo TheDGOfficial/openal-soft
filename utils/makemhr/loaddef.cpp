@@ -27,16 +27,13 @@
 
 #include <bit>
 #include <cctype>
-#include <cmath>
 #include <cstdarg>
 #include <cstdlib>
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <optional>
 #include <ranges>
 #include <span>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -59,7 +56,10 @@ import gsl;
 #else
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include "alstring.h"

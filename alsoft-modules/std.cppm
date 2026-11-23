@@ -1,18 +1,26 @@
 module;
 
 #include <algorithm>
+#include <array>
+#include <cmath>
 #include <compare>
 #include <exception>
 #include <fstream>
 #include <ios>
 #include <iostream>
 #include <istream>
+#include <mutex>
+#include <new>
+#include <numbers>
+#include <optional>
 #include <ostream>
 #include <source_location>
 #include <sstream>
 #include <stdexcept>
 #include <streambuf>
+#include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
 
 export module common.std;
@@ -210,6 +218,85 @@ export namespace std {
         using std::ranges::prev_permutation;
     }
 
+    /* array */
+    using std::array;
+    using std::to_array;
+
+    /* cmath */
+#define DECL_CMATH_OP(x) using x; using x##f; using x##l;
+    using std::abs;
+    DECL_CMATH_OP(std::fabs)
+    DECL_CMATH_OP(std::fmod)
+    DECL_CMATH_OP(std::remainder)
+    DECL_CMATH_OP(std::remquo)
+    DECL_CMATH_OP(std::fma)
+    DECL_CMATH_OP(std::fmax)
+    DECL_CMATH_OP(std::fmin)
+    DECL_CMATH_OP(std::fdim)
+    DECL_CMATH_OP(std::nan)
+    using std::lerp;
+    DECL_CMATH_OP(std::exp)
+    DECL_CMATH_OP(std::exp2)
+    DECL_CMATH_OP(std::expm1)
+    DECL_CMATH_OP(std::log)
+    DECL_CMATH_OP(std::log10)
+    DECL_CMATH_OP(std::log2)
+    DECL_CMATH_OP(std::log1p)
+    DECL_CMATH_OP(std::pow)
+    DECL_CMATH_OP(std::sqrt)
+    DECL_CMATH_OP(std::cbrt)
+    DECL_CMATH_OP(std::hypot)
+    DECL_CMATH_OP(std::sin)
+    DECL_CMATH_OP(std::cos)
+    DECL_CMATH_OP(std::tan)
+    DECL_CMATH_OP(std::asin)
+    DECL_CMATH_OP(std::acos)
+    DECL_CMATH_OP(std::atan)
+    DECL_CMATH_OP(std::atan2)
+    DECL_CMATH_OP(std::sinh)
+    DECL_CMATH_OP(std::cosh)
+    DECL_CMATH_OP(std::tanh)
+    DECL_CMATH_OP(std::asinh)
+    DECL_CMATH_OP(std::acosh)
+    DECL_CMATH_OP(std::atanh)
+    DECL_CMATH_OP(std::erf)
+    DECL_CMATH_OP(std::erfc)
+    DECL_CMATH_OP(std::tgamma)
+    DECL_CMATH_OP(std::lgamma)
+    DECL_CMATH_OP(std::ceil)
+    DECL_CMATH_OP(std::floor)
+    DECL_CMATH_OP(std::trunc)
+    DECL_CMATH_OP(std::round)
+    DECL_CMATH_OP(std::lround)
+    DECL_CMATH_OP(std::llround)
+    DECL_CMATH_OP(std::nearbyint)
+    DECL_CMATH_OP(std::rint)
+    DECL_CMATH_OP(std::lrint)
+    DECL_CMATH_OP(std::llrint)
+    DECL_CMATH_OP(std::frexp)
+    DECL_CMATH_OP(std::ldexp)
+    DECL_CMATH_OP(std::modf)
+    DECL_CMATH_OP(std::scalbn)
+    DECL_CMATH_OP(std::scalbln)
+    DECL_CMATH_OP(std::ilogb)
+    DECL_CMATH_OP(std::logb)
+    DECL_CMATH_OP(std::nextafter)
+    DECL_CMATH_OP(std::nexttoward)
+    DECL_CMATH_OP(std::copysign)
+#undef DECL_CMATH_OP
+    using std::fpclassify;
+    using std::isfinite;
+    using std::isinf;
+    using std::isnan;
+    using std::isnormal;
+    using std::signbit;
+    using std::isgreater;
+    using std::isgreaterequal;
+    using std::isless;
+    using std::islessequal;
+    using std::islessgreater;
+    using std::isunordered;
+
     /* compare */
     using std::three_way_comparable;
     using std::three_way_comparable_with;
@@ -303,6 +390,100 @@ export namespace std {
     using std::io_errc;
     using std::iostream_category;
 
+    /* mutex */
+    using std::mutex;
+    using std::timed_mutex;
+    using std::recursive_mutex;
+    using std::recursive_timed_mutex;
+    using std::lock_guard;
+    using std::unique_lock;
+    using std::scoped_lock;
+    using std::once_flag;
+    using std::try_lock;
+    using std::lock;
+    using std::call_once;
+    using std::defer_lock;
+    using std::try_to_lock;
+    using std::adopt_lock;
+    using std::defer_lock_t;
+    using std::try_to_lock_t;
+    using std::adopt_lock_t;
+
+    /* new */
+    using std::bad_alloc;
+    using std::bad_array_new_length;
+    using std::align_val_t;
+    using std::new_handler;
+    using std::nothrow;
+    using std::nothrow_t;
+    using std::destroying_delete;
+    using std::destroying_delete_t;
+    using std::hardware_destructive_interference_size;
+    using std::hardware_constructive_interference_size;
+    using std::launder;
+
+    /* numbers */
+    namespace numbers {
+        using std::numbers::e_v;
+        using std::numbers::log2e_v;
+        using std::numbers::log10e_v;
+        using std::numbers::pi_v;
+        using std::numbers::inv_pi_v;
+        using std::numbers::inv_sqrtpi_v;
+        using std::numbers::ln2_v;
+        using std::numbers::ln10_v;
+        using std::numbers::sqrt2_v;
+        using std::numbers::sqrt3_v;
+        using std::numbers::inv_sqrt3_v;
+        using std::numbers::egamma_v;
+        using std::numbers::phi_v;
+        using std::numbers::e;
+        using std::numbers::log2e;
+        using std::numbers::log10e;
+        using std::numbers::pi;
+        using std::numbers::inv_pi;
+        using std::numbers::inv_sqrtpi;
+        using std::numbers::ln2;
+        using std::numbers::ln10;
+        using std::numbers::sqrt2;
+        using std::numbers::sqrt3;
+        using std::numbers::inv_sqrt3;
+        using std::numbers::egamma;
+        using std::numbers::phi;
+    }
+
+    /* optional */
+    using std::optional;
+    using std::bad_optional_access;
+    using std::nullopt_t;
+    using std::nullopt;
+    using std::make_optional;
+
+    /* string */
+    using std::char_traits;
+    using std::basic_string;
+    using std::string;
+    using std::u8string;
+    using std::u16string;
+    using std::u32string;
+    using std::wstring;
+    using std::getline;
+    using std::stoi;
+    using std::stol;
+    using std::stoll;
+    using std::stoul;
+    using std::stoull;
+    using std::stof;
+    using std::stod;
+    using std::stold;
+    using std::to_string;
+    using std::to_wstring;
+    inline namespace literals {
+        inline namespace string_literals {
+            using std::literals::string_literals::operator ""s;
+        }
+    }
+
     /* thread */
     using std::thread;
     using std::jthread;
@@ -313,6 +494,21 @@ export namespace std {
         using std::this_thread::sleep_for;
         using std::this_thread::sleep_until;
     }
+
+    /* tuple */
+    using std::tuple;
+    using std::tuple_size;
+    using std::tuple_element;
+    using std::tuple_size;
+    using std::tuple_element;
+    using std::uses_allocator;
+    using std::ignore;
+    using std::make_tuple;
+    using std::tie;
+    using std::forward_as_tuple;
+    using std::tuple_cat;
+    using std::apply;
+    using std::make_from_tuple;
 
     /* utility */
     using std::cmp_equal;
@@ -362,12 +558,43 @@ export namespace std {
     using std::overflow_error;
     using std::underflow_error;
 
-    using std::swap;
+    using std::begin;
+    using std::cbegin;
+    using std::end;
+    using std::cend;
+    using std::rbegin;
+    using std::crbegin;
+    using std::rend;
+    using std::crend;
+    using std::size;
+    using std::ssize;
+    using std::empty;
+    using std::data;
+
+    using std::erase;
+    using std::erase_if;
+    using std::get;
     using std::hash;
+    using std::swap;
+
+    using std::operator+;
     using std::operator>>;
     using std::operator<<;
     using std::operator==;
+    using std::operator!=;
+    using std::operator<;
+    using std::operator<=;
+    using std::operator>;
+    using std::operator>=;
     using std::operator<=>;
 
 }
 /* NOLINTEND(bugprone-std-namespace-modification, cert-dcl58-cpp) */
+
+export {
+    /* new */
+    using ::operator new;
+    using ::operator new[];
+    using ::operator delete;
+    using ::operator delete[];
+}

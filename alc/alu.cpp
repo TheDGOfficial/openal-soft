@@ -23,10 +23,8 @@
 
 #include "alu.h"
 
-#include <array>
 #include <atomic>
 #include <chrono>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -34,10 +32,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <numbers>
-#include <optional>
 #include <span>
-#include <string>
 #include <string_view>
 #include <variant>
 
@@ -63,34 +58,39 @@
 #include "core/uhjfilter.h"
 #include "core/voice_change.h"
 #include "core/front_stablizer.h"
-#include "envutils.hpp"
 #include "intrusive_ptr.h"
-#include "opthelpers.h"
 #include "vecmat.h"
 
 #if HAVE_CXXMODULES
 import common.std;
 
 import alstring;
-import bsinc_tables;
 import cemath;
 import core.ambi_utils;
+import core.bsinc_tables;
 import core.buffer_storage;
 import core.context;
+import core.cubic_tables;
 import core.device;
 import core.effectslot;
+import core.hrtfstore;
 import core.voice;
-import cubic_tables;
+import envutils;
 import format;
 import gsl;
-import hrtfstore;
 import numeric;
+import opthelpers;
 import zudl;
 #include "gsl_macros.hpp"
 
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <numbers>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include "alformat.hpp"
@@ -106,8 +106,10 @@ import zudl;
 #include "core/effectslot.h"
 #include "core/hrtfstore.hpp"
 #include "core/voice.h"
+#include "envutils.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

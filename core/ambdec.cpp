@@ -5,11 +5,9 @@
 
 #include <bit>
 #include <cctype>
-#include <cmath>
 #include <cstddef>
 #include <iterator>
 #include <span>
-#include <string>
 
 #if HAVE_CXXMODULES
 import common.std;
@@ -24,8 +22,10 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <cmath>
 #include <istream>
 #include <sstream>
+#include <string>
 
 #include "alformat.hpp"
 #include "alstring.h"

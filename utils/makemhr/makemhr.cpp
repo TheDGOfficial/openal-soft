@@ -66,14 +66,12 @@
 
 #include <atomic>
 #include <chrono>
-#include <cmath>
 #include <complex>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
 #include <memory>
-#include <numbers>
 #include <ranges>
 #include <span>
 #include <string_view>
@@ -99,7 +97,9 @@ import zstring_view;
 #else
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <numbers>
 #include <thread>
 
 #include "alformatzsv.hpp"

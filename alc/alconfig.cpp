@@ -30,18 +30,14 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
-#include <array>
 #include <bit>
 #include <cctype>
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
 #include <ranges>
-#include <string>
 #include <string_view>
 #include <vector>
-
-#include "envutils.hpp"
 
 #if ALSOFT_UWP
 #include <winrt/Windows.Media.Core.h> // !!This is important!!
@@ -56,24 +52,28 @@ import common.std;
 
 import alstring;
 import core.helpers;
+import core.logging;
+import envutils;
 import filesystem;
 import fmtlib;
 import gsl;
 import inout_ptr;
-import logging;
 import numeric;
 
 #else
 
 #include <algorithm>
+#include <array>
 #include <istream>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 #include "alformatpath.hpp"
 #include "alstring.h"
 #include "core/helpers.hpp"
 #include "core/logging.h"
+#include "envutils.hpp"
 #include "filesystem.h"
 #include "fmt/format.h"
 #include "fmt/ranges.h"

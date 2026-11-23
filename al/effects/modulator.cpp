@@ -1,11 +1,9 @@
 
 #include "config.h"
 
-#include <optional>
 #include <string_view>
 
 #include "effects.h"
-#include "opthelpers.h"
 
 #if ALSOFT_EAX
 #include "al/eax/api.h"
@@ -32,9 +30,11 @@ import alc.context;
 import format;
 import gsl;
 import numeric;
+import opthelpers;
 
 #else
 
+#include <optional>
 #include <stdexcept>
 
 #include "AL/al.h"
@@ -44,6 +44,7 @@ import numeric;
 #include "alformat.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #endif
 
 

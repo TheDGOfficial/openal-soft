@@ -20,20 +20,18 @@
 
 #include "config.h"
 
-#include "winmm.hpp"
-
 #include <windows.h>
 #include <mmsystem.h>
 #include <mmreg.h>
 
-#include <array>
 #include <atomic>
+#include <bit>
 #include <cstddef>
 #include <cstdint>
 #include <ranges>
-#include <string>
 #include <vector>
 
+#include "alc/events.h"
 #include "althrd_setname.h"
 #include "vector.h"
 
@@ -45,12 +43,13 @@
 import common.std;
 
 import alstring;
+import backends.base;
 import backends.exception;
 import core.device;
 import core.helpers;
+import core.logging;
 import format;
 import gsl;
-import logging;
 import numeric;
 import ringbuffer;
 import zudl;
@@ -58,8 +57,11 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <string>
 #include <thread>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alstring.h"
@@ -592,6 +594,10 @@ auto WinMMBackendFactory::init() -> bool
 
 auto WinMMBackendFactory::querySupport(BackendType const type) -> bool
 { return type == BackendType::Playback || type == BackendType::Capture; }
+
+auto WinMMBackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto WinMMBackendFactory::enumerate(BackendType const type) -> std::vector<std::string>
 {

@@ -1,8 +1,6 @@
 
 #include "config.h"
 
-#include <array>
-#include <cmath>
 #include <span>
 #include <string_view>
 #include <variant>
@@ -32,7 +30,7 @@ import common.std;
 import openal;
 
 import alc.context;
-import logging;
+import core.logging;
 import gsl;
 import numeric;
 import zudl;
@@ -41,6 +39,8 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
 
 #include "AL/al.h"
 #include "AL/efx.h"

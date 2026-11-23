@@ -20,22 +20,18 @@
 
 #include "config.h"
 
-#include "coreaudio.hpp"
-
 #include <cinttypes>
-#include <cmath>
 #include <functional>
 #include <memory>
-#include <optional>
 #include <ranges>
 #include <span>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string>
 #include <string.h>
 #include <unistd.h>
 #include <vector>
 
+#include "alc/events.h"
 #include "core/converter.h"
 
 #include <AudioUnit/AudioUnit.h>
@@ -49,18 +45,26 @@
 #endif
 
 #if HAVE_CXXMODULES
+import common.std;
+
 import alstring;
+import backends.base;
 import backends.exception;
 import core.device;
+import core.logging;
 import format;
 import gsl;
-import logging;
 import numeric;
 import ringbuffer;
 import zudl;
 
 #else
 
+#include <cmath>
+#include <optional>
+#include <string>
+
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alstring.h"

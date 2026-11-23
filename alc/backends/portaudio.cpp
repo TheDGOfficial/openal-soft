@@ -20,24 +20,24 @@
 
 #include "config.h"
 
-#include "portaudio.hpp"
-
-#include <cmath>
 #include <cstring>
-#include <string>
 #include <utility>
 
 #include "alc/alconfig.h"
+#include "alc/events.h"
 #include "dlopennote.h"
 #include "dynload.h"
 
 #include <portaudio.h>
 
 #if HAVE_CXXMODULES
+import common.std;
+
+import backends.base;
 import backends.exception;
 import core.device;
+import core.logging;
 import gsl;
-import logging;
 import numeric;
 import ringbuffer;
 import zstring_view;
@@ -45,6 +45,10 @@ import zudl;
 
 #else
 
+#include <cmath>
+#include <string>
+
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alformatzsv.hpp"
 #include "core/device.h"
@@ -523,6 +527,10 @@ auto PortBackendFactory::init() -> bool
 
 auto PortBackendFactory::querySupport(BackendType const type) -> bool
 { return (type == BackendType::Playback || type == BackendType::Capture); }
+
+auto PortBackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto PortBackendFactory::enumerate(BackendType const type) -> std::vector<std::string>
 {

@@ -5,7 +5,6 @@
 
 #include <bit>
 #include <climits>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
@@ -13,7 +12,6 @@
 #include <span>
 
 #include "fpu_ctrl.h"
-#include "opthelpers.h"
 
 #if HAVE_CXXMODULES
 import common.std;
@@ -21,16 +19,19 @@ import common.std;
 import core.device;
 import gsl;
 import numeric;
+import opthelpers;
 import zudl;
 #include "gsl_macros.hpp"
 
 #else
 
 #include <algorithm>
+#include <cmath>
 
 #include "core/devfmttraits.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

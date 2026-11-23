@@ -3,14 +3,13 @@ module;
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <new>
 #include <span>
 
 #include "intrusive_ptr.h"
 #include "mixer/hrtfdefs.h"
 #include "opthelper_macros.hpp"
 
-export module hrtfstore;
+export module core.hrtfstore;
 
 import filesystem;
 import gsl;

@@ -20,12 +20,9 @@
 
 #include "config.h"
 
-#include <array>
 #include <bit>
-#include <cmath>
 #include <cstdint>
 #include <iterator>
-#include <numbers>
 #include <ranges>
 #include <span>
 
@@ -45,9 +42,9 @@ import common.std;
 
 import core.ambi_utils;
 import core.context;
+import core.cubic_tables;
 import core.device;
 import core.effectslot;
-import cubic_tables;
 import gsl;
 import numeric;
 import zudl;
@@ -56,6 +53,9 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <numbers>
 
 #include "core/ambi_utils.hpp"
 #include "core/context.h"

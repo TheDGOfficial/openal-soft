@@ -1,20 +1,14 @@
 
 #include "config.h"
 
-#include <array>
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
 #include <memory>
-#include <mutex>
-#include <optional>
 #include <ranges>
 #include <string_view>
-#include <tuple>
 #include <unordered_map>
-
-#include "opthelpers.h"
 
 #if HAVE_CXXMODULES
 import common.std;
@@ -24,11 +18,16 @@ import openal;
 import alsoft.router;
 import alstring;
 import gsl;
+import opthelpers;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <array>
+#include <mutex>
+#include <optional>
+#include <tuple>
 
 #include "AL/alc.h"
 #include "AL/al.h"
@@ -36,6 +35,7 @@ import zudl;
 
 #include "alstring.h"
 #include "gsl/gsl"
+#include "opthelpers.hpp"
 #include "router.h"
 #include "zudl.hpp"
 #endif

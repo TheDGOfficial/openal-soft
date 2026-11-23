@@ -20,13 +20,11 @@
 
 #include "config.h"
 
-#include "sdl2.hpp"
-
 #include <cstdlib>
 #include <cstring>
-#include <string>
 #include <string_view>
 
+#include "alc/events.h"
 #include "pragmadefs.h"
 
 DIAGNOSTIC_PUSH
@@ -35,6 +33,9 @@ std_pragma("GCC diagnostic ignored \"-Wold-style-cast\"")
 DIAGNOSTIC_POP
 
 #if HAVE_CXXMODULES
+import common.std;
+
+import backends.base;
 import backends.exception;
 import core.device;
 import gsl;
@@ -43,6 +44,9 @@ import zudl;
 
 #else
 
+#include <string>
+
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "core/device.h"
 #include "gsl/gsl"
@@ -253,6 +257,10 @@ auto SDL2BackendFactory::init() -> bool
 
 auto SDL2BackendFactory::querySupport(BackendType const type) -> bool
 { return type == BackendType::Playback; }
+
+auto SDL2BackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto SDL2BackendFactory::enumerate(BackendType const type) -> std::vector<std::string>
 {

@@ -20,12 +20,8 @@
 
 #include "config.h"
 
-#include "pipewire.hpp"
-
-#include <array>
 #include <atomic>
 #include <bit>
-#include <cmath>
 #include <concepts>
 #include <cstdlib>
 #include <cstdint>
@@ -36,16 +32,13 @@
 #include <functional>
 #include <iterator>
 #include <memory>
-#include <mutex>
-#include <optional>
 #include <span>
 #include <string_view>
-#include <tuple>
 
 #include "alc/alconfig.h"
+#include "alc/events.h"
 #include "dlopennote.h"
 #include "dynload.h"
-#include "opthelpers.h"
 #include "pragmadefs.h"
 
 /* Ignore warnings caused by PipeWire headers (lots in standard C++ mode). GCC
@@ -127,15 +120,17 @@ DIAGNOSTIC_POP;
 import common.std;
 
 import alstring;
+import backends.base;
 import backends.exception;
 import core.device;
 import core.helpers;
+import core.logging;
 import filesystem;
 import fmtlib;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import ringbuffer;
 import spanstream;
 import zstring_view;
@@ -143,9 +138,15 @@ import zstring_view;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <mutex>
+#include <optional>
 #include <thread>
+#include <tuple>
 #include <utility>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alformatzsv.hpp"
@@ -158,6 +159,7 @@ import zstring_view;
 #include "fmt/ranges.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "ringbuffer.hpp"
 #include "spanstream.hpp"
 #include "zstring_view.hpp"

@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include <array>
-#include <cmath>
 #include <cstdint>
 #include <functional>
 #include <ranges>
@@ -47,6 +45,8 @@ import core.effectslot;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
 
 #include "core/context.h"
 #include "core/device.h"

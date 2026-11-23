@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include "wasapi.hpp"
-
 #include <windows.h>
 
 #include <cstdio>
@@ -56,17 +54,15 @@
 #include <future>
 #include <iterator>
 #include <memory>
-#include <mutex>
 #include <span>
-#include <string>
 #include <string_view>
 #include <vector>
 
 #include "alc/alconfig.h"
+#include "alc/events.h"
 #include "althrd_setname.h"
 #include "comptr.h"
 #include "core/converter.h"
-#include "opthelpers.h"
 
 #if ALSOFT_UWP
 #include <winrt/Windows.Media.Core.h> // !!This is important!!
@@ -97,13 +93,15 @@ DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_GUID, 0x1da5d803, 0xd492, 0x4edd, 0x8c, 0x
 import common.std;
 
 import alstring;
+import backends.base;
 import backends.exception;
 import core.device;
+import core.logging;
 import format;
 import gsl;
 import inout_ptr;
-import logging;
 import numeric;
+import opthelpers;
 import ringbuffer;
 import zudl;
 #include "gsl_macros.hpp"
@@ -111,8 +109,11 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <mutex>
+#include <string>
 #include <thread>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alstring.h"
 #include "alformat.hpp"
@@ -121,6 +122,7 @@ import zudl;
 #include "gsl/gsl"
 #include "inout_ptr.hpp"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "ringbuffer.hpp"
 #include "zudl.hpp"
 #endif

@@ -20,20 +20,17 @@
 
 #include "config.h"
 
-#include "alsa.hpp"
-
 #include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <memory>
-#include <mutex>
 #include <span>
-#include <string>
 #include <string_view>
 #include <vector>
 
 #include "alc/alconfig.h"
+#include "alc/events.h"
 #include "althrd_setname.h"
 #include "dlopennote.h"
 #include "dynload.h"
@@ -43,13 +40,14 @@
 #if HAVE_CXXMODULES
 import common.std;
 
+import backends.base;
 import backends.exception;
 import core.device;
 import core.helpers;
+import core.logging;
 import format;
 import gsl;
 import inout_ptr;
-import logging;
 import numeric;
 import ringbuffer;
 import zstring_view;
@@ -58,9 +56,12 @@ import zstring_view;
 
 #include <algorithm>
 #include <exception>
+#include <mutex>
+#include <string>
 #include <thread>
 #include <utility>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alformat.hpp"
 #include "alformatzsv.hpp"
@@ -1220,8 +1221,12 @@ auto AlsaBackendFactory::init() -> bool
     return true;
 }
 
-bool AlsaBackendFactory::querySupport(BackendType type)
+auto AlsaBackendFactory::querySupport(BackendType const type) -> bool
 { return (type == BackendType::Playback || type == BackendType::Capture); }
+
+auto AlsaBackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto AlsaBackendFactory::enumerate(BackendType type) -> std::vector<std::string>
 {

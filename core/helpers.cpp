@@ -7,10 +7,7 @@
 
 #include <cstdlib>
 #include <functional>
-#include <mutex>
-#include <optional>
 #include <span>
-#include <string>
 #include <string_view>
 #include <system_error>
 #include <vector>
@@ -52,27 +49,31 @@
 #endif
 #endif
 
-#include "envutils.hpp"
-
 #if HAVE_CXXMODULES
 import common.std;
 
 import alstring;
 import core.helpers;
+import core.logging;
+import envutils;
 import filesystem;
-import logging;
 import numeric;
 import zstring_view;
 
 #else
 
 #include <algorithm>
+#include <array>
+#include <mutex>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include "alformatpath.hpp"
 #include "alstring.h"
 #include "core/helpers.hpp"
 #include "core/logging.h"
+#include "envutils.hpp"
 #include "filesystem.h"
 #include "numeric.hpp"
 #include "zstring_view.hpp"
@@ -164,7 +165,9 @@ auto GetProcBinary() -> fs::path const&
         }
         resultpath = std::wstring_view{exePath};
 #endif
-#endif
+
+#else
+
 #ifdef __FreeBSD__
         auto pathlen = size_t{};
         auto mib = std::array<int,4>{{CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1}};
@@ -223,6 +226,7 @@ auto GetProcBinary() -> fs::path const&
                 }
             }
         }
+#endif
 #endif
 
         resultpath.make_preferred();

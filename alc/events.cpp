@@ -6,22 +6,35 @@
 #include <ranges>
 #include <span>
 
-#include "backends/base.hpp"
 #include "bitset.hpp"
-#include "opthelpers.h"
 
 #if HAVE_CXXMODULES
+import common.std;
+import openal;
+
 import alc.device;
+import backends.base;
+import core.logging;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
+
 #else
+
+#include <optional>
+
+#include "AL/alc.h"
+#include "AL/al.h"
+#include "AL/alext.h"
+
+#include "backends/base.hpp"
 #include "alc/device.h"
 #include "alformat.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #endif
 
 

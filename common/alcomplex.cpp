@@ -3,10 +3,8 @@
 
 #include "alcomplex.h"
 
-#include <array>
 #include <bit>
 #include <cstdint>
-#include <numbers>
 #include <ranges>
 
 #if HAVE_CXXMODULES
@@ -20,6 +18,8 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <numbers>
 
 #include "bit.hpp"
 #include "gsl/gsl"

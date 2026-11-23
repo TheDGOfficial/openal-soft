@@ -2,14 +2,12 @@
 #include "config.h"
 #include "config_simd.h"
 
-#include <array>
 #include <atomic>
 #include <cstdint>
 #include <cstdlib>
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <optional>
 #include <ranges>
 #include <span>
 #include <vector>
@@ -35,9 +33,9 @@ import alstring;
 import core.ambi_utils;
 import core.buffer_storage;
 import core.device;
+import core.logging;
 import core.voice;
 import gsl;
-import logging;
 import numeric;
 import zudl;
 #include "gsl_macros.hpp"
@@ -45,6 +43,8 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <optional>
 #include <utility>
 
 #include "alstring.h"
@@ -1286,7 +1286,7 @@ void Voice::prepare(DeviceBase *device)
         -> std::pair<std::unique_ptr<DecoderBase>, unsigned>
     {
         using decoder_t = T::decoder_t;
-        return {std::make_unique<decoder_t>(), decoder_t::sInputPadding};
+        return {std::make_unique<decoder_t>(), unsigned{decoder_t::sInputPadding}};
     };
     if(mFmtChannels == FmtSuperStereo)
     {

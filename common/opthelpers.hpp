@@ -1,6 +1,7 @@
-#ifndef OPTHELPERS_H
-#define OPTHELPERS_H
+#ifndef OPTHELPERS_HPP
+#define OPTHELPERS_HPP
 
+#include <concepts>
 #include <functional>
 #include <type_traits>
 
@@ -15,8 +16,8 @@ concept dependent_false = false;
 template<auto>
 concept dependent_false_v = false;
 
-template<typename T> [[nodiscard]] constexpr
-auto to_underlying(T e) noexcept -> std::underlying_type_t<T>
+template<typename T> requires(std::is_enum_v<T>) [[nodiscard]] constexpr
+auto to_underlying(T const& e) noexcept -> std::underlying_type_t<T>
 { return static_cast<std::underlying_type_t<T>>(e); }
 
 template<typename T>
@@ -28,7 +29,7 @@ struct dereference {
     { return *std::forward<T>(p); }
 };
 
-template<typename F>
+template<std::invocable F>
 struct assign_result {
     using result_t = std::invoke_result_t<F>;
     F&& mCallable;
@@ -39,4 +40,4 @@ struct assign_result {
 
 } // namespace al
 
-#endif /* OPTHELPERS_H */
+#endif /* OPTHELPERS_HPP */

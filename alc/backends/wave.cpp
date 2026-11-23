@@ -20,9 +20,6 @@
 
 #include "config.h"
 
-#include "wave.hpp"
-
-#include <array>
 #include <atomic>
 #include <bit>
 #include <cerrno>
@@ -35,6 +32,7 @@
 #include <vector>
 
 #include "alc/alconfig.h"
+#include "alc/events.h"
 #include "althrd_setname.h"
 #include "core/ambidefs.h"
 
@@ -42,20 +40,23 @@
 import common.std;
 
 import alstring;
+import backends.base;
 import backends.exception;
 import core.device;
+import core.logging;
 import filesystem;
 import gsl;
-import logging;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <array>
 #include <exception>
 #include <ostream>
 #include <thread>
 
+#include "alc/backends/base.hpp"
 #include "alc/backends/exception.hpp"
 #include "alstring.h"
 #include "core/device.h"
@@ -516,6 +517,10 @@ auto WaveBackendFactory::init() -> bool
 
 auto WaveBackendFactory::querySupport(BackendType const type) -> bool
 { return type == BackendType::Playback; }
+
+auto WaveBackendFactory::queryEventSupport(alc::EventType const event, BackendType const type)
+    -> alc::EventSupport
+{ return BackendFactory::queryEventSupport(event, type); }
 
 auto WaveBackendFactory::enumerate(BackendType const type) -> std::vector<std::string>
 {

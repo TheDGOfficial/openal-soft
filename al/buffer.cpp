@@ -20,7 +20,6 @@
 
 #include "config.h"
 
-#include <array>
 #include <atomic>
 #include <bit>
 #include <cstddef>
@@ -29,9 +28,6 @@
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <mutex>
-#include <new>
-#include <optional>
 #include <ranges>
 #include <span>
 #include <unordered_map>
@@ -40,13 +36,11 @@
 
 #include "alc/inprogext.h"
 #include "almalloc.h"
-#include "core/except.h"
 #include "core/fmt_traits.h"
 #include "core/resampler_limits.hpp"
 #include "core/storage_formats.h"
 #include "direct_defs.h"
 #include "intrusive_ptr.h"
-#include "opthelpers.h"
 #include "vector.h"
 
 #if ALSOFT_EAX
@@ -74,16 +68,22 @@ import openal;
 import al.iface;
 import alc.context;
 import alc.device;
+import core.except;
+import core.logging;
 import core.voice;
 import format;
 import gsl;
-import logging;
 import numeric;
+import opthelpers;
 import zudl;
 
 #else
 
 #include <algorithm>
+#include <array>
+#include <mutex>
+#include <new>
+#include <optional>
 #include <stdexcept>
 #include <utility>
 
@@ -94,10 +94,12 @@ import zudl;
 #include "alc/context.hpp"
 #include "alc/device.h"
 #include "alformat.hpp"
+#include "core/except.hpp"
 #include "core/logging.h"
 #include "core/voice.h"
 #include "gsl/gsl"
 #include "numeric.hpp"
+#include "opthelpers.hpp"
 #include "zudl.hpp"
 #endif
 

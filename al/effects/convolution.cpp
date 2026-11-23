@@ -1,8 +1,6 @@
 
 #include "config.h"
 
-#include <array>
-#include <cmath>
 #include <span>
 
 #include "alc/inprogext.h"
@@ -19,6 +17,8 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <array>
+#include <cmath>
 
 #include "AL/al.h"
 
