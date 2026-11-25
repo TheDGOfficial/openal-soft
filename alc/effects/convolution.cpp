@@ -21,7 +21,6 @@
 #include "alcomplex.h"
 #include "base.h"
 #include "core/bufferline.h"
-#include "core/effects/base.h"
 #include "core/filters/splitter.h"
 #include "core/mixer.h"
 #include "core/storage_formats.h"
@@ -39,6 +38,7 @@ import core.ambi_utils;
 import core.buffer_storage;
 import core.context;
 import core.device;
+import core.effects.base;
 import core.effectslot;
 import core.fmt_traits;
 import gsl;
@@ -52,11 +52,13 @@ import zudl;
 #include <array>
 #include <cmath>
 #include <numbers>
+#include <variant>
 
 #include "core/ambi_utils.hpp"
 #include "core/buffer_storage.h"
 #include "core/context.h"
 #include "core/device.h"
+#include "core/effects/base.hpp"
 #include "core/effectslot.h"
 #include "core/fmt_traits.hpp"
 #include "gsl/gsl"

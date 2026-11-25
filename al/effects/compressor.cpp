@@ -3,8 +3,6 @@
 
 #include <string_view>
 
-#include "effects.h"
-
 #if ALSOFT_EAX
 #include "al/eax/api.h"
 #if HAVE_CXXMODULES
@@ -23,30 +21,26 @@ import eax.validator;
 #endif // ALSOFT_EAX
 
 #if HAVE_CXXMODULES
+import common.std;
 import openal;
 
+import al.effects.handlers;
 import alc.context;
+import core.effects.base;
 import numeric;
 #else
+
+#include <variant>
 
 #include "AL/al.h"
 #include "AL/efx.h"
 
+#include "al/effects/handlers.hpp"
 #include "alc/context.hpp"
+#include "core/effects/base.hpp"
 #include "numeric.hpp"
 #endif
 
-
-namespace {
-
-consteval auto genDefaultProps() noexcept -> EffectProps
-{
-    return CompressorProps{.OnOff = AL_COMPRESSOR_DEFAULT_ONOFF};
-}
-
-} // namespace
-
-constinit const EffectProps CompressorEffectProps(genDefaultProps());
 
 void CompressorEffectHandler::SetParami(al::Context& context, CompressorProps &props, ALenum param, int val)
 {

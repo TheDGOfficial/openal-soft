@@ -3,8 +3,6 @@
 
 #include <string_view>
 
-#include "effects.h"
-
 #if ALSOFT_EAX
 #include "al/eax/api.h"
 #if HAVE_CXXMODULES
@@ -26,8 +24,10 @@ import eax.validator;
 import common.std;
 import openal;
 
+import al.effects.handlers;
 import alc.context;
 import format;
+import core.effects.base;
 import gsl;
 import numeric;
 import opthelpers;
@@ -36,12 +36,15 @@ import opthelpers;
 
 #include <optional>
 #include <stdexcept>
+#include <variant>
 
 #include "AL/al.h"
 #include "AL/efx.h"
 
+#include "al/effects/handlers.hpp"
 #include "alc/context.hpp"
 #include "alformat.hpp"
+#include "core/effects/base.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "opthelpers.hpp"
@@ -152,22 +155,7 @@ constexpr ALenum EnumFromWaveform(VMorpherWaveform type)
         al::to_underlying(type))};
 }
 
-consteval auto genDefaultProps() noexcept -> EffectProps
-{
-    /* NOLINTBEGIN(bugprone-unchecked-optional-access) */
-    return VmorpherProps{
-        .Rate                 = AL_VOCAL_MORPHER_DEFAULT_RATE,
-        .PhonemeA             = PhenomeFromEnum(AL_VOCAL_MORPHER_DEFAULT_PHONEMEA).value(),
-        .PhonemeB             = PhenomeFromEnum(AL_VOCAL_MORPHER_DEFAULT_PHONEMEB).value(),
-        .PhonemeACoarseTuning = AL_VOCAL_MORPHER_DEFAULT_PHONEMEA_COARSE_TUNING,
-        .PhonemeBCoarseTuning = AL_VOCAL_MORPHER_DEFAULT_PHONEMEB_COARSE_TUNING,
-        .Waveform             = WaveformFromEmum(AL_VOCAL_MORPHER_DEFAULT_WAVEFORM).value()};
-    /* NOLINTEND(bugprone-unchecked-optional-access) */
-}
-
 } // namespace
-
-constinit const EffectProps VmorpherEffectProps(genDefaultProps());
 
 void VmorpherEffectHandler::SetParami(al::Context& context, VmorpherProps &props, ALenum param, int val)
 {

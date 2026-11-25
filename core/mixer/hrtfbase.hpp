@@ -1,11 +1,11 @@
-#ifndef CORE_MIXER_HRTFBASE_H
-#define CORE_MIXER_HRTFBASE_H
+#ifndef CORE_MIXER_HRTFBASE_HPP
+#define CORE_MIXER_HRTFBASE_HPP
 
 #include <algorithm>
 #include <cstddef>
 #include <ranges>
 
-#include "defs.h"
+#include "defs.hpp"
 #include "hrtfdefs.h"
 #include "opthelper_macros.hpp"
 
@@ -131,4 +131,4 @@ void MixDirectHrtfBase(FloatBufferSpan const LeftOut, FloatBufferSpan const Righ
     std::fill_n(accum_iter, SamplesToDo, f32x2{});
 }
 
-#endif /* CORE_MIXER_HRTFBASE_H */
+#endif /* CORE_MIXER_HRTFBASE_HPP */

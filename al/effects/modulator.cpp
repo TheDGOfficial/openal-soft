@@ -3,8 +3,6 @@
 
 #include <string_view>
 
-#include "effects.h"
-
 #if ALSOFT_EAX
 #include "al/eax/api.h"
 #if HAVE_CXXMODULES
@@ -26,7 +24,9 @@ import eax.validator;
 import common.std;
 import openal;
 
+import al.effects.handlers;
 import alc.context;
+import core.effects.base;
 import format;
 import gsl;
 import numeric;
@@ -36,12 +36,15 @@ import opthelpers;
 
 #include <optional>
 #include <stdexcept>
+#include <variant>
 
 #include "AL/al.h"
 #include "AL/efx.h"
 
+#include "al/effects/handlers.hpp"
 #include "alc/context.hpp"
 #include "alformat.hpp"
+#include "core/effects/base.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "opthelpers.hpp"
@@ -72,18 +75,7 @@ constexpr auto EnumFromWaveform(ModulatorWaveform type) -> ALenum
         al::to_underlying(type))};
 }
 
-consteval auto genDefaultProps() noexcept -> EffectProps
-{
-    return ModulatorProps{
-        .Frequency      = AL_RING_MODULATOR_DEFAULT_FREQUENCY,
-        .HighPassCutoff = AL_RING_MODULATOR_DEFAULT_HIGHPASS_CUTOFF,
-        /* NOLINTNEXTLINE(bugprone-unchecked-optional-access) */
-        .Waveform       = WaveformFromEmum(AL_RING_MODULATOR_DEFAULT_WAVEFORM).value()};
-}
-
 } // namespace
-
-constinit const EffectProps ModulatorEffectProps(genDefaultProps());
 
 void ModulatorEffectHandler::SetParami(al::Context& context, ModulatorProps &props, ALenum param, int val)
 {

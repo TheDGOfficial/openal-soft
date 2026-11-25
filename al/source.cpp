@@ -40,7 +40,6 @@
 #include "alc/inprogext.h"
 #include "almalloc.h"
 #include "atomic.h"
-#include "core/mixer/defs.h"
 #include "core/storage_formats.h"
 #include "core/voice_change.h"
 #include "direct_defs.h"
@@ -71,6 +70,7 @@ import alc.device;
 import backends.base;
 import core.except;
 import core.logging;
+import core.mixer.defs;
 import core.voice;
 import format;
 import gsl;
@@ -93,6 +93,7 @@ import zudl;
 #include <string>
 #include <tuple>
 #include <utility>
+#include <variant>
 
 #include "AL/al.h"
 #include "AL/alext.h"
@@ -109,6 +110,7 @@ import zudl;
 #include "alformat.hpp"
 #include "core/except.hpp"
 #include "core/logging.h"
+#include "core/mixer/defs.hpp"
 #include "core/voice.h"
 #include "gsl/gsl"
 #include "numeric.hpp"

@@ -5,10 +5,8 @@
 #include <ranges>
 #include <span>
 #include <string_view>
-#include <variant>
 
 #include "atomic.h"
-#include "core/effects/base.h"
 #include "direct_defs.h"
 #include "intrusive_ptr.h"
 
@@ -20,6 +18,7 @@ import openal;
 import al.iface;
 import alc.context;
 import core.async_event;
+import core.effects.base;
 import core.except;
 import core.logging;
 import format;
@@ -35,6 +34,7 @@ import numeric;
 #include <string>
 #include <thread>
 #include <tuple>
+#include <variant>
 
 #include "AL/al.h"
 #include "AL/alext.h"
@@ -43,6 +43,7 @@ import numeric;
 #include "alc/context.hpp"
 #include "alformat.hpp"
 #include "core/async_event.hpp"
+#include "core/effects/base.hpp"
 #include "core/except.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"

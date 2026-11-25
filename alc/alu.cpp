@@ -32,7 +32,6 @@
 #include <memory>
 #include <span>
 #include <string_view>
-#include <variant>
 
 #include "atomic.h"
 #include "core/bformatdec.h"
@@ -40,14 +39,12 @@
 #include "core/bsinc_defs.h"
 #include "core/bufferline.h"
 #include "core/cpu_caps.h"
-#include "core/effects/base.h"
 #include "core/filters/biquad.h"
 #include "core/filters/nfc.h"
 #include "core/fpu_ctrl.h"
 #include "core/hrtf.h"
 #include "core/mastering.h"
 #include "core/mixer.h"
-#include "core/mixer/defs.h"
 #include "core/mixer/hrtfdefs.h"
 #include "core/mixparams.hpp"
 #include "core/resampler_limits.hpp"
@@ -70,8 +67,10 @@ import core.buffer_storage;
 import core.context;
 import core.cubic_tables;
 import core.device;
+import core.effects.base;
 import core.effectslot;
 import core.hrtfstore;
+import core.mixer.defs;
 import core.voice;
 import envutils;
 import format;
@@ -92,6 +91,7 @@ import zudl;
 #include <optional>
 #include <string>
 #include <utility>
+#include <variant>
 
 #include "alformat.hpp"
 #include "alstring.h"
@@ -104,8 +104,10 @@ import zudl;
 #include "core/buffer_storage.h"
 #include "core/device.h"
 #include "core/devfmttraits.hpp"
+#include "core/effects/base.hpp"
 #include "core/effectslot.h"
 #include "core/hrtfstore.hpp"
+#include "core/mixer/defs.hpp"
 #include "core/voice.h"
 #include "envutils.hpp"
 #include "gsl/gsl"

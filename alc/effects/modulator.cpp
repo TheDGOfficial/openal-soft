@@ -24,12 +24,10 @@
 #include <functional>
 #include <ranges>
 #include <span>
-#include <variant>
 
 #include "alc/effects/base.h"
 #include "core/ambidefs.h"
 #include "core/bufferline.h"
-#include "core/effects/base.h"
 #include "core/filters/biquad.h"
 #include "core/mixer.h"
 #include "core/mixparams.hpp"
@@ -40,6 +38,7 @@ import common.std;
 
 import core.context;
 import core.device;
+import core.effects.base;
 import core.effectslot;
 import gsl;
 import zudl;
@@ -50,9 +49,11 @@ import zudl;
 #include <array>
 #include <cmath>
 #include <numbers>
+#include <variant>
 
 #include "core/context.h"
 #include "core/device.h"
+#include "core/effects/base.hpp"
 #include "core/effectslot.h"
 #include "gsl/gsl"
 #include "zudl.hpp"

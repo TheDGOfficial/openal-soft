@@ -4,13 +4,14 @@
 #include <span>
 
 #include "alc/inprogext.h"
-#include "effects.h"
 
 #if HAVE_CXXMODULES
 import common.std;
 import openal;
 
+import al.effects.handlers;
 import alc.context;
+import core.effects.base;
 import numeric;
 import zudl;
 
@@ -19,27 +20,17 @@ import zudl;
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <variant>
 
 #include "AL/al.h"
 
+#include "al/effects/handlers.hpp"
 #include "alc/context.hpp"
+#include "core/effects/base.hpp"
 #include "numeric.hpp"
 #include "zudl.hpp"
 #endif
 
-
-namespace {
-
-consteval auto genDefaultProps() noexcept -> EffectProps
-{
-    return ConvolutionProps{
-        .OrientAt = {0.0f,  0.0f, -1.0f},
-        .OrientUp = {0.0f,  1.0f,  0.0f}};
-}
-
-} // namespace
-
-constinit const EffectProps ConvolutionEffectProps(genDefaultProps());
 
 void ConvolutionEffectHandler::SetParami(al::Context& context, ConvolutionProps& /*props*/, ALenum param, int /*val*/)
 { context.throw_error(AL_INVALID_ENUM, "Invalid convolution effect integer property {:#04x}", as_unsigned(param)); }

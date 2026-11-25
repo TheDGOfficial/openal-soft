@@ -878,7 +878,7 @@ set(CORE_HDRS
     core/devfmttraits.hpp
     core/devformat.h
     core/device.h
-    core/effects/base.h
+    core/effects/base.hpp
     core/effectslot.h
     core/encoderbase.hpp
     core/filters/biquad.h
@@ -910,6 +910,7 @@ if(HAVE_CXXMODULES)
         core/converter.cppm
         core/cubic_tables.cppm
         core/device.cppm
+        core/effects/base.cppm
         core/effectslot.cppm
         core/except.cppm
         core/fmt_traits.cppm
@@ -971,9 +972,12 @@ endif()
 list(APPEND CORE_SRCS
     core/mixer/mixer_c.cpp)
 list(APPEND CORE_HDRS
-    core/mixer/defs.h
-    core/mixer/hrtfbase.h
+    core/mixer/defs.hpp
+    core/mixer/hrtfbase.hpp
     core/mixer/hrtfdefs.h)
+if(HAVE_CXXMODULES)
+    list(APPEND CORE_MODS  core/mixer/defs.cppm core/mixer/hrtfbase.cppm)
+endif()
 
 # AL and related routines
 set(OPENAL_SRCS
@@ -988,7 +992,6 @@ set(OPENAL_SRCS
     al/effects/dedicated.cpp
     al/effects/distortion.cpp
     al/effects/echo.cpp
-    al/effects/effects.cpp
     al/effects/equalizer.cpp
     al/effects/fshifter.cpp
     al/effects/modulator.cpp
@@ -1009,13 +1012,13 @@ set(OPENAL_HDRS
     al/debug.h
     al/direct_defs.h
     al/effect.h
-    al/effects/effects.h
+    al/effects/handlers.hpp
     al/event.h
     al/filter.h
     al/listener.h
     al/source.h)
 if(HAVE_CXXMODULES)
-    list(APPEND CORE_MODS  al/iface.cppm)
+    list(APPEND CORE_MODS  al/effects/handlers.cppm al/iface.cppm)
 endif()
 
 # ALC and related routines

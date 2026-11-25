@@ -37,6 +37,7 @@
 #include "core/fpu_ctrl.h"
 #include "direct_defs.h"
 #include "flexarray.h"
+#include "intrusive_ptr.h"
 
 #if ALSOFT_EAX
 #include "eax/api.h"
@@ -61,6 +62,7 @@ import openal;
 import al.iface;
 import alc.context;
 import alc.device;
+import core.effects.base;
 import core.except;
 import core.logging;
 import format;
@@ -87,6 +89,7 @@ import zudl;
 #include "alc/context.hpp"
 #include "alc/device.h"
 #include "alformat.hpp"
+#include "core/effects/base.hpp"
 #include "core/except.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"

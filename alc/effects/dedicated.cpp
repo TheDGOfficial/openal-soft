@@ -22,11 +22,9 @@
 
 #include <cstdint>
 #include <span>
-#include <variant>
 
 #include "alc/effects/base.h"
 #include "core/bufferline.h"
-#include "core/effects/base.h"
 #include "core/mixer.h"
 #include "core/mixparams.hpp"
 #include "intrusive_ptr.h"
@@ -36,14 +34,17 @@ import common.std;
 
 import core.ambi_utils;
 import core.device;
+import core.effects.base;
 import core.effectslot;
 
 #else
 
 #include <array>
+#include <variant>
 
 #include "core/ambi_utils.hpp"
 #include "core/device.h"
+#include "core/effects/base.hpp"
 #include "core/effectslot.h"
 #endif
 

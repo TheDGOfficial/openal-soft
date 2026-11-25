@@ -24,11 +24,9 @@
 #include <cstdint>
 #include <ranges>
 #include <span>
-#include <variant>
 
 #include "alc/effects/base.h"
 #include "core/bufferline.h"
-#include "core/effects/base.h"
 #include "core/filters/biquad.h"
 #include "core/filters/splitter.h"
 #include "core/mixer.h"
@@ -41,6 +39,7 @@ import common.std;
 import core.ambi_utils;
 import core.context;
 import core.device;
+import core.effects.base;
 import core.effectslot;
 import zudl;
 
@@ -51,10 +50,12 @@ import zudl;
 #include <cmath>
 #include <numbers>
 #include <optional>
+#include <variant>
 
 #include "core/ambi_utils.hpp"
 #include "core/context.h"
 #include "core/device.h"
+#include "core/effects/base.hpp"
 #include "core/effectslot.h"
 #include "zudl.hpp"
 #endif

@@ -3,8 +3,6 @@
 
 #include <string_view>
 
-#include "effects.h"
-
 #if ALSOFT_EAX
 #include "al/eax/api.h"
 #if HAVE_CXXMODULES
@@ -26,7 +24,9 @@ import eax.validator;
 import common.std;
 import openal;
 
+import al.effects.handlers;
 import alc.context;
+import core.effects.base;
 import format;
 import numeric;
 import opthelpers;
@@ -35,12 +35,15 @@ import opthelpers;
 
 #include <optional>
 #include <stdexcept>
+#include <variant>
 
 #include "AL/al.h"
 #include "AL/efx.h"
 
+#include "al/effects/handlers.hpp"
 #include "alc/context.hpp"
 #include "alformat.hpp"
+#include "core/effects/base.hpp"
 #include "numeric.hpp"
 #include "opthelpers.hpp"
 #endif
@@ -69,20 +72,7 @@ constexpr ALenum EnumFromDirection(FShifterDirection dir)
     throw std::runtime_error{al::format("Invalid direction: {}", al::to_underlying(dir))};
 }
 
-consteval EffectProps genDefaultProps() noexcept
-{
-    /* NOLINTBEGIN(bugprone-unchecked-optional-access) */
-    FshifterProps props{};
-    props.Frequency      = AL_FREQUENCY_SHIFTER_DEFAULT_FREQUENCY;
-    props.LeftDirection  = DirectionFromEmum(AL_FREQUENCY_SHIFTER_DEFAULT_LEFT_DIRECTION).value();
-    props.RightDirection = DirectionFromEmum(AL_FREQUENCY_SHIFTER_DEFAULT_RIGHT_DIRECTION).value();
-    return props;
-    /* NOLINTEND(bugprone-unchecked-optional-access) */
-}
-
 } // namespace
-
-constinit const EffectProps FshifterEffectProps(genDefaultProps());
 
 void FshifterEffectHandler::SetParami(al::Context& context, FshifterProps &props, ALenum param, int val)
 {

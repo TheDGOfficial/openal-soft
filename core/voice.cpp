@@ -17,7 +17,6 @@
 #include "filters/nfc.h"
 #include "filters/splitter.h"
 #include "mixer.h"
-#include "mixer/defs.h"
 #include "mixer/hrtfdefs.h"
 #include "opthelper_macros.hpp"
 #include "resampler_limits.hpp"
@@ -34,6 +33,7 @@ import core.context;
 import core.device;
 import core.fmt_traits;
 import core.logging;
+import core.mixer.defs;
 import core.voice;
 import gsl;
 import numeric;
@@ -48,6 +48,7 @@ import zudl;
 #include <limits>
 #include <optional>
 #include <utility>
+#include <variant>
 
 #include "alstring.h"
 #include "core/ambi_utils.hpp"
@@ -57,6 +58,7 @@ import zudl;
 #include "core/device.h"
 #include "core/fmt_traits.hpp"
 #include "core/logging.h"
+#include "core/mixer/defs.hpp"
 #include "core/voice.h"
 #include "gsl/gsl"
 #include "numeric.hpp"

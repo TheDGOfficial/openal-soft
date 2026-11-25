@@ -4,20 +4,19 @@
 #include <xmmintrin.h>
 
 #include <span>
-#include <variant>
 
 #include "core/bsinc_defs.h"
 #include "core/bufferline.h"
 #include "core/cubic_defs.h"
 #include "core/mixer/hrtfdefs.h"
 #include "core/resampler_limits.hpp"
-#include "defs.h"
-#include "hrtfbase.h"
 #include "opthelper_macros.hpp"
 
 #if HAVE_CXXMODULES
 import common.std;
 
+import core.mixer.defs;
+import core.mixer.hrtfbase;
 import gsl;
 import zudl;
 
@@ -27,7 +26,10 @@ import zudl;
 #include <array>
 #include <cmath>
 #include <limits>
+#include <variant>
 
+#include "core/mixer/defs.hpp"
+#include "core/mixer/hrtfbase.hpp"
 #include "gsl/gsl"
 #include "zudl.hpp"
 #endif

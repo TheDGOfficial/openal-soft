@@ -28,10 +28,8 @@
 #include <ranges>
 #include <string_view>
 #include <unordered_map>
-#include <variant>
 #include <vector>
 
-#include "al/effects/effects.h"
 #include "alc/inprogext.h"
 #include "almalloc.h"
 #include "direct_defs.h"
@@ -40,10 +38,12 @@
 import common.std;
 import openal;
 
+import al.effects.handlers;
 import al.iface;
 import alc.context;
 import alc.device;
 import alstring;
+import core.effects.base;
 import core.except;
 import core.logging;
 import gsl;
@@ -57,15 +57,18 @@ import zudl;
 #include <mutex>
 #include <new>
 #include <utility>
+#include <variant>
 
 #include "AL/al.h"
 #include "AL/alext.h"
 #include "AL/efx.h"
 
 #include "al/effect.h"
+#include "al/effects/handlers.hpp"
 #include "alc/context.hpp"
 #include "alc/device.h"
 #include "alstring.h"
+#include "core/effects/base.hpp"
 #include "core/except.hpp"
 #include "core/logging.h"
 #include "gsl/gsl"
@@ -83,7 +86,8 @@ using namespace std::string_view_literals;
 
 using SubListAllocator = al::allocator<std::array<al::Effect,64>>;
 
-constexpr auto GetDefaultProps(ALenum const type) noexcept -> const EffectProps&
+[[nodiscard]] constexpr
+auto GetDefaultProps(ALenum const type) noexcept -> EffectProps
 {
     switch(type)
     {

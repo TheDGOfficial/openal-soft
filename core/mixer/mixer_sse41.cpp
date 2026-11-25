@@ -26,16 +26,15 @@
 
 #include <cstddef>
 #include <span>
-#include <variant>
 
 #include "core/cubic_defs.h"
 #include "core/resampler_limits.hpp"
-#include "defs.h"
 #include "opthelper_macros.hpp"
 
 #if HAVE_CXXMODULES
 import common.std;
 
+import core.mixer.defs;
 import gsl;
 import numeric;
 
@@ -43,7 +42,9 @@ import numeric;
 
 #include <algorithm>
 #include <array>
+#include <variant>
 
+#include "core/mixer/defs.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"
 #endif
