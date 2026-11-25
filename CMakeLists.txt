@@ -870,7 +870,7 @@ set(CORE_HDRS
     core/bufferline.h
     core/buffer_storage.h
     core/context.h
-    core/converter.h
+    core/converter.hpp
     core/cpu_caps.h
     core/cubic_defs.h
     core/cubic_tables.hpp
@@ -884,7 +884,7 @@ set(CORE_HDRS
     core/filters/biquad.h
     core/filters/nfc.h
     core/filters/splitter.h
-    core/fmt_traits.h
+    core/fmt_traits.hpp
     core/fpu_ctrl.h
     core/front_stablizer.h
     core/hrtf.h
@@ -907,10 +907,12 @@ if(HAVE_CXXMODULES)
         core/bsinc_tables.cppm
         core/buffer_storage.cppm
         core/context.cppm
+        core/converter.cppm
         core/cubic_tables.cppm
         core/device.cppm
         core/effectslot.cppm
         core/except.cppm
+        core/fmt_traits.cppm
         core/helpers.cppm
         core/hrtfstore.cppm
         core/logging.cppm

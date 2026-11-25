@@ -65,12 +65,10 @@
 #include "makemhr.h"
 
 #include <atomic>
-#include <chrono>
 #include <complex>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <limits>
 #include <memory>
 #include <ranges>
 #include <span>
@@ -97,8 +95,10 @@ import zstring_view;
 #else
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <numbers>
 #include <thread>
 

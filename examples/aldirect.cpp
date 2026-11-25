@@ -28,9 +28,7 @@
 
 #include "config.h"
 
-#include <chrono>
 #include <cstddef>
-#include <limits>
 #include <memory>
 #include <ranges>
 #include <span>
@@ -53,7 +51,9 @@ import zstring_view;
 #else
 
 #include <algorithm>
+#include <chrono>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <thread>
