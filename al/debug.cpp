@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <cstring>
 #include <deque>
-#include <functional>
 #include <ranges>
 #include <span>
 #include <string_view>
@@ -33,6 +32,7 @@ import zudl;
 
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <mutex>
 #include <optional>
 #include <stdexcept>
@@ -370,7 +370,7 @@ try {
         if(newlen >= MaxDebugMessageLength)
             context.throw_error(AL_INVALID_VALUE, "Debug message too long ({} >= {})", newlen,
                 MaxDebugMessageLength);
-        length = gsl::narrow_cast<ALsizei>(newlen);
+        length = gsl::narrow<ALsizei>(newlen);
     }
     else if(length >= int{MaxDebugMessageLength})
         context.throw_error(AL_INVALID_VALUE, "Debug message too long ({} >= {})", length,
@@ -462,7 +462,7 @@ try {
             });
             return todo;
         }
-        return gsl::narrow_cast<ALuint>(std::min(context.mDebugLog.size(), size_t{count}));
+        return gsl::narrow<ALuint>(std::min(context.mDebugLog.size(), std::size_t{count}));
     });
     if(toget < 1)
         return 0;
@@ -483,7 +483,7 @@ try {
     {
         std::ranges::transform(logrange, std::span{lengths, toget}.begin(),
             [](const std::string_view msg)
-        { return gsl::narrow_cast<ALsizei>(msg.size()+1); }, &DebugLogEntry::mMessage);
+        { return gsl::narrow<ALsizei>(msg.size()+1); }, &DebugLogEntry::mMessage);
     }
 
     if(logBuf)
@@ -572,14 +572,14 @@ try {
         });
 
         if(labelOut.empty())
-            *length = gsl::narrow_cast<ALsizei>(objname.size());
+            *length = gsl::narrow<ALsizei>(objname.size());
         else
         {
             const auto namerange = objname | std::views::take(labelOut.size()-1);
             auto oiter = std::ranges::copy(namerange, labelOut.begin()).out;
             *oiter = '\0';
             if(length)
-                *length = gsl::narrow_cast<ALsizei>(namerange.size());
+                *length = gsl::narrow<ALsizei>(namerange.size());
         }
     };
 
@@ -624,6 +624,29 @@ catch(std::exception &e) {
 } // namespace
 
 
+DebugGroup::DebugGroup(al::debug_defaults_t) : mId{0}, mSource{DebugSource::Other}
+{
+    /* Low-severity debug messages are disabled by default. */
+    static auto constexpr svridx = std::uint32_t{DebugSeverityBase
+        + al::to_underlying(DebugSeverity::Low)};
+
+    std::ranges::for_each(std::views::iota(DebugSourceBase, DebugSourceBase+DebugSourceCount),
+        [this](std::uint32_t const srcidx)
+    {
+        auto const srcfilt = std::uint32_t{1}<<srcidx;
+        std::ranges::for_each(std::views::iota(DebugTypeBase, DebugTypeBase+DebugTypeCount),
+            [srcfilt, this](std::uint32_t const typeidx)
+        {
+            auto const srctype = srcfilt | (std::uint32_t{1}<<typeidx);
+            auto const filter = srctype | (std::uint32_t{1}<<svridx);
+            if(auto const iter = std::ranges::lower_bound(mFilters, filter);
+                iter == mFilters.cend() || *iter != filter)
+                mFilters.insert(iter, filter);
+        });
+    });
+}
+
+
 void al::Context::sendDebugMessage(std::unique_lock<std::mutex> &debuglock, DebugSource source,
     DebugType type, ALuint id, DebugSeverity severity, al::zstring_view message)
 {
@@ -659,7 +682,7 @@ void al::Context::sendDebugMessage(std::unique_lock<std::mutex> &debuglock, Debu
         auto param = mDebugParam;
         debuglock.unlock();
         callback(GetDebugSourceEnum(source), GetDebugTypeEnum(type), id,
-            GetDebugSeverityEnum(severity), gsl::narrow_cast<ALsizei>(message.size()),
+            GetDebugSeverityEnum(severity), al::saturating_cast<ALsizei>(message.size()),
             message.c_str(), param);
     }
     else

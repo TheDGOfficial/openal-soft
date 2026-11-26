@@ -5,8 +5,10 @@ module;
 #include <chrono>
 #include <cmath>
 #include <compare>
+#include <condition_variable>
 #include <exception>
 #include <fstream>
+#include <functional>
 #include <ios>
 #include <iostream>
 #include <istream>
@@ -431,6 +433,12 @@ export namespace std {
     using std::is_gt;
     using std::is_gteq;
 
+    /* condition_variable */
+    using std::condition_variable;
+    using std::condition_variable_any;
+    using std::cv_status;
+    using std::notify_all_at_thread_exit;
+
     /* exception */
     using std::exception;
     using std::nested_exception;
@@ -446,6 +454,53 @@ export namespace std {
     using std::terminate;
     using std::get_terminate;
     using std::set_terminate;
+
+    /* functional */
+    using std::function;
+    using std::mem_fn;
+    using std::reference_wrapper;
+    using std::unwrap_reference;
+    using std::unwrap_ref_decay;
+    using std::bad_function_call;
+    using std::is_bind_expression;
+    using std::is_placeholder;
+    using std::plus;
+    using std::minus;
+    using std::multiplies;
+    using std::divides;
+    using std::modulus;
+    using std::negate;
+    using std::equal_to;
+    using std::not_equal_to;
+    using std::greater;
+    using std::less;
+    using std::greater_equal;
+    using std::less_equal;
+    namespace ranges {
+        using std::ranges::equal_to;
+        using std::ranges::not_equal_to;
+        using std::ranges::greater;
+        using std::ranges::less;
+        using std::ranges::greater_equal;
+        using std::ranges::less_equal;
+    }
+    using std::logical_and;
+    using std::logical_or;
+    using std::logical_not;
+    using std::bit_and;
+    using std::bit_or;
+    using std::bit_xor;
+    using std::bit_not;
+    using std::not_fn;
+    using std::identity;
+    using std::default_searcher;
+    using std::boyer_moore_searcher;
+    using std::boyer_moore_horspool_searcher;
+    using std::bind_front;
+    using std::bind;
+    using std::ref;
+    using std::cref;
+    using std::invoke;
 
     /* ios, iostream, etc... */
     using std::cerr;

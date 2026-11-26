@@ -28,7 +28,6 @@
 #include <cstdint>
 #include <deque>
 #include <iterator>
-#include <functional>
 #include <memory>
 #include <ranges>
 #include <span>
@@ -39,7 +38,6 @@
 
 #include "alc/inprogext.h"
 #include "almalloc.h"
-#include "atomic.h"
 #include "core/storage_formats.h"
 #include "core/voice_change.h"
 #include "direct_defs.h"
@@ -67,6 +65,7 @@ import openal;
 import al.iface;
 import alc.context;
 import alc.device;
+import atomic;
 import backends.base;
 import core.except;
 import core.logging;
@@ -85,6 +84,7 @@ import zudl;
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <functional>
 #include <limits>
 #include <mutex>
 #include <new>
@@ -108,6 +108,7 @@ import zudl;
 #include "alc/context.hpp"
 #include "alc/device.h"
 #include "alformat.hpp"
+#include "atomic.hpp"
 #include "core/except.hpp"
 #include "core/logging.h"
 #include "core/mixer/defs.hpp"
