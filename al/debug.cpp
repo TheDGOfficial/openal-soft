@@ -2,9 +2,6 @@
 
 #include <atomic>
 #include <cstdint>
-#include <cstring>
-#include <deque>
-#include <ranges>
 #include <span>
 #include <string_view>
 #include <unordered_map>
@@ -32,9 +29,11 @@ import zudl;
 
 #include <algorithm>
 #include <array>
+#include <deque>
 #include <functional>
 #include <mutex>
 #include <optional>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -361,19 +360,13 @@ catch(std::exception &e) {
 }
 
 
-void alPushDebugGroupEXT_(al::Context& context, ALenum source, ALuint id, ALsizei length,
-    const ALchar *message) noexcept
+void alPushDebugGroupEXT_(al::Context& context, ALenum const source, ALuint const id,
+    ALsizei const length, ALchar const*const message) noexcept
 try {
-    if(length < 0)
-    {
-        const auto newlen = std::strlen(message);
-        if(newlen >= MaxDebugMessageLength)
-            context.throw_error(AL_INVALID_VALUE, "Debug message too long ({} >= {})", newlen,
-                MaxDebugMessageLength);
-        length = gsl::narrow<ALsizei>(newlen);
-    }
-    else if(length >= int{MaxDebugMessageLength})
-        context.throw_error(AL_INVALID_VALUE, "Debug message too long ({} >= {})", length,
+    auto const msgview = length < 0 ? std::string_view{message}
+        : std::string_view{message, gsl::narrow<std::size_t>(length)};
+    if(msgview.size() >= MaxDebugMessageLength)
+        context.throw_error(AL_INVALID_VALUE, "Debug message too long ({} >= {})", msgview.size(),
             MaxDebugMessageLength);
 
     const auto dsource = GetDebugSource(source);
@@ -387,10 +380,8 @@ try {
     if(context.mDebugGroups.size() >= MaxDebugGroupDepth)
         context.throw_error(AL_STACK_OVERFLOW_EXT, "Pushing too many debug groups");
 
-    context.mDebugGroups.emplace_back(*dsource, id,
-        std::string_view{message, gsl::narrow<std::size_t>(length)});
+    auto &newback = context.mDebugGroups.emplace_back(*dsource, id, msgview);
     auto &oldback = *(context.mDebugGroups.end()-2);
-    auto &newback = context.mDebugGroups.back();
 
     newback.mFilters = oldback.mFilters;
     newback.mIdFilters = oldback.mIdFilters;

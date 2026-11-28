@@ -21,12 +21,12 @@
 #include "config.h"
 
 #include <atomic>
-#include <bit>
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <span>
+#include <string_view>
 #include <system_error>
 #include <vector>
 
@@ -51,6 +51,7 @@ import zudl;
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <chrono>
 #include <exception>
 #include <functional>

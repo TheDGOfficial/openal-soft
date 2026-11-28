@@ -5,15 +5,11 @@
 #include "config.h"
 
 #include <atomic>
-#include <bit>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <deque>
 #include <future>
 #include <memory>
-#include <ranges>
-#include <ratio>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -70,13 +66,17 @@ import zudl;
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <chrono>
 #include <cmath>
 #include <condition_variable>
+#include <deque>
 #include <functional>
 #include <iostream>
 #include <mutex>
 #include <numbers>
+#include <ranges>
+#include <ratio>
 #include <string>
 #include <thread>
 #include <utility>
@@ -124,7 +124,6 @@ using std::chrono::nanoseconds;
 using std::chrono::microseconds;
 using std::chrono::milliseconds;
 using std::chrono::seconds;
-using std::chrono::duration_cast;
 
 
 constexpr auto AppName = std::to_array("alffplay");
@@ -150,8 +149,10 @@ const auto AudioAvgFilterCoeff = std::pow(0.01, 1.0/AudioDiffAvgNB); /* NOLINT(c
 
 /* Per-buffer size, in time */
 constexpr auto AudioBufferTime = milliseconds{20};
-/* Buffer total size, in time (should be divisible by the buffer time) */
+/* Buffer total size, in time */
 constexpr auto AudioBufferTotalTime = milliseconds{800};
+static_assert(AudioBufferTotalTime % AudioBufferTime == milliseconds::zero(),
+    "Total buffer time must be divisible by the per-buffer time");
 constexpr auto AudioBufferCount = AudioBufferTotalTime / AudioBufferTime;
 
 

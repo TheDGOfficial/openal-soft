@@ -22,10 +22,10 @@
 
 #include <cinttypes>
 #include <memory>
-#include <ranges>
 #include <span>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string_view>
 #include <string.h>
 #include <unistd.h>
 #include <vector>
@@ -62,6 +62,7 @@ import zudl;
 #include <cmath>
 #include <functional>
 #include <optional>
+#include <ranges>
 #include <string>
 
 #include "alc/backends/base.hpp"

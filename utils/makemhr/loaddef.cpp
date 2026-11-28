@@ -25,14 +25,11 @@
 
 #include "loaddef.h"
 
-#include <bit>
 #include <cctype>
 #include <cstdarg>
 #include <cstdint>
 #include <cstdlib>
-#include <iterator>
 #include <memory>
-#include <ranges>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -56,10 +53,13 @@ import gsl;
 #else
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <utility>
 

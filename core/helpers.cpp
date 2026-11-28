@@ -41,7 +41,6 @@
 #if HAVE_RTKIT
 #include <sys/resource.h>
 
-#include "rtkit.h"
 #ifndef RLIMIT_RTTIME
 #define RLIMIT_RTTIME 15
 #endif
@@ -58,6 +57,10 @@ import envutils;
 import filesystem;
 import numeric;
 import zstring_view;
+#if !defined(_WIN32) && HAVE_RTKIT
+import core.rtkit;
+import expected;
+#endif
 
 #else
 
@@ -77,6 +80,10 @@ import zstring_view;
 #include "filesystem.h"
 #include "numeric.hpp"
 #include "zstring_view.hpp"
+#if !defined(_WIN32) && HAVE_RTKIT
+#include "core/rtkit.hpp"
+#include "expected.hpp"
+#endif
 #endif
 
 

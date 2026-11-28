@@ -27,11 +27,9 @@
 #include <unistd.h>
 
 #include <atomic>
-#include <bit>
 #include <cerrno>
 #include <cstring>
 #include <memory>
-#include <ranges>
 #include <span>
 #include <string_view>
 #include <system_error>
@@ -82,8 +80,10 @@ import ringbuffer;
 #else
 
 #include <algorithm>
+#include <bit>
 #include <exception>
 #include <functional>
+#include <ranges>
 #include <string>
 #include <thread>
 #include <utility>

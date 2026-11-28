@@ -21,13 +21,11 @@
 #include "config.h"
 
 #include <atomic>
-#include <bit>
 #include <cstddef>
 #include <cstdint>
-#include <iterator>
 #include <memory>
-#include <ranges>
 #include <span>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -78,11 +76,14 @@ import zudl;
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <functional>
+#include <iterator>
 #include <limits>
 #include <mutex>
 #include <new>
 #include <optional>
+#include <ranges>
 #include <stdexcept>
 #include <utility>
 #include <variant>
@@ -246,7 +247,6 @@ auto AllocBuffer(al::Device& device) noexcept -> gsl::not_null<al::Buffer*>
         [](BufferSubList const &slist) { return slist.mFreeMask != 0; });
     auto const lidx = gsl::narrow_cast<ALuint>(std::distance(device.BufferList.begin(), sublist));
     auto const slidx = as_unsigned(std::countr_zero(sublist->mFreeMask));
-    ASSUME(slidx < 64);
 
     auto const buffer = gsl::make_not_null(std::construct_at(&(*sublist->mBuffers)[slidx]));
 

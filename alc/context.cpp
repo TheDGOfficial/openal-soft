@@ -1,12 +1,10 @@
 
 #include "config.h"
 
-#include <bit>
 #include <string_view>
 
 #include "alc/alu.h"
 #include "core/voice_change.h"
-#include "flexarray.h"
 #include "intrusive_ptr.h"
 #include "vecmat.h"
 
@@ -44,6 +42,7 @@ import zudl;
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <functional>
 #include <optional>
 #include <utility>
@@ -219,7 +218,7 @@ void Context::init()
     if(sDefaultEffect.mType != AL_EFFECT_NULL && mDevice.Type == DeviceType::Playback)
     {
         mDefaultSlot = std::make_unique<EffectSlot>(*this);
-        aluInitEffectPanning(mDefaultSlot->mSlot, this);
+        aluInitEffectPanning(*mDefaultSlot->mSlot, mDevice.mAmbiOrder);
     }
 
     auto auxslots = std::unique_ptr<EffectSlotArray>{};

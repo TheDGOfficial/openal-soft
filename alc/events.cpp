@@ -3,7 +3,6 @@
 
 #include "events.h"
 
-#include <ranges>
 #include <span>
 
 #include "bitset.hpp"
@@ -19,10 +18,12 @@ import format;
 import gsl;
 import numeric;
 import opthelpers;
+import zstring_view;
 
 #else
 
 #include <optional>
+#include <ranges>
 
 #include "AL/alc.h"
 #include "AL/al.h"
@@ -35,6 +36,7 @@ import opthelpers;
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "opthelpers.hpp"
+#include "zstring_view.hpp"
 #endif
 
 

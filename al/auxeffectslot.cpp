@@ -20,12 +20,10 @@
 
 #include "config.h"
 
-#include <bit>
 #include <cstdint>
-#include <iterator>
 #include <memory>
-#include <ranges>
 #include <span>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -35,7 +33,6 @@
 #include "almalloc.h"
 #include "core/fpu_ctrl.h"
 #include "direct_defs.h"
-#include "flexarray.h"
 #include "intrusive_ptr.h"
 
 #if ALSOFT_EAX
@@ -74,8 +71,11 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <bit>
+#include <iterator>
 #include <mutex>
 #include <new>
+#include <ranges>
 #include <stdexcept>
 #include <tuple>
 
@@ -324,11 +324,10 @@ auto AllocEffectSlot(al::Context& context) -> gsl::not_null<al::EffectSlot*>
     auto const lidx = gsl::narrow_cast<ALuint>(std::distance(context.mEffectSlotList.begin(),
         sublist));
     auto const slidx = as_unsigned(std::countr_zero(sublist->mFreeMask));
-    ASSUME(slidx < 64);
 
     auto const slot = gsl::make_not_null(std::construct_at(&(*sublist->mEffectSlots)[slidx],
         context));
-    aluInitEffectPanning(slot->mSlot, &context);
+    aluInitEffectPanning(*slot->mSlot, context.mDevice.mAmbiOrder);
 
     /* Add 1 to avoid ID 0. */
     slot->mId = ((lidx<<6) | slidx) + 1;

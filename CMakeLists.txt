@@ -761,11 +761,11 @@ set(COMMON_HDRS
     common/cemath.hpp
     common/comptr.h
     common/disable_alloc.hpp
-    common/dynload.h
+    common/dynload.hpp
     common/dlopennote.h
     common/expected.hpp
     common/filesystem.h
-    common/flexarray.h
+    common/flexarray.hpp
     common/ghc_filesystem.h
     common/gsl_macros.hpp
     common/inout_ptr.hpp
@@ -806,8 +806,11 @@ if(HAVE_CXXMODULES)
         common/atomic.cppm
         common/bit.cppm
         common/cemath.cppm
+        common/dynload.cppm
         common/envutils.cppm
+        common/expected.cppm
         common/filesystem.cppm
+        common/flexarray.cppm
         common/hann_window.cppm
         common/inout_ptr.cppm
         common/numeric.cppm
@@ -860,12 +863,12 @@ set(CORE_SRCS
 set(CORE_HDRS
     core/allpass_conv.hpp
     core/allpass_iir.hpp
-    core/ambdec.h
+    core/ambdec.hpp
     core/ambidefs.h
     core/ambi_utils.hpp
     core/async_event.hpp
     core/bformatdec.h
-    core/bs2b.h
+    core/bs2b.hpp
     core/bsinc_defs.h
     core/bsinc_tables.hpp
     core/bufferline.h
@@ -887,8 +890,8 @@ set(CORE_HDRS
     core/filters/splitter.h
     core/fmt_traits.hpp
     core/fpu_ctrl.h
-    core/front_stablizer.h
-    core/hrtf.h
+    core/front_stablizer.hpp
+    core/hrtf.hpp
     core/hrtf_loader.hpp
     core/hrtf_resource.hpp
     core/mastering.h
@@ -903,8 +906,10 @@ set(CORE_HDRS
 if(HAVE_CXXMODULES)
     list(APPEND CORE_MODS
         core/allpass_conv.cppm
+        core/ambdec.cppm
         core/ambi_utils.cppm
         core/async_event.cppm
+        core/bs2b.cppm
         core/bsinc_tables.cppm
         core/buffer_storage.cppm
         core/context.cppm
@@ -915,7 +920,9 @@ if(HAVE_CXXMODULES)
         core/effectslot.cppm
         core/except.cppm
         core/fmt_traits.cppm
+        core/front_stablizer.cppm
         core/helpers.cppm
+        core/hrtf.cppm
         core/hrtfstore.cppm
         core/logging.cppm
         core/voice.cppm)
@@ -939,7 +946,10 @@ if(NOT WIN32)
         if(DBus1_FOUND OR DBUS_FOUND)
             set(HAVE_RTKIT 1)
             list(APPEND CORE_SRCS core/rtkit.cpp)
-            list(APPEND CORE_HDRS core/rtkit.h)
+            list(APPEND CORE_HDRS core/rtkit.hpp)
+            if(HAVE_CXXMODULES)
+                list(APPEND CORE_MODS core/rtkit.cppm)
+            endif()
             if(NOT DBus1_FOUND)
                 list(APPEND INC_PATHS ${DBUS_INCLUDE_DIRS})
                 list(APPEND CPP_DEFS ${DBUS_CFLAGS_OTHER})

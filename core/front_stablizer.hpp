@@ -1,5 +1,5 @@
-#ifndef CORE_FRONT_STABLIZER_H
-#define CORE_FRONT_STABLIZER_H
+#ifndef CORE_FRONT_STABLIZER_HPP
+#define CORE_FRONT_STABLIZER_HPP
 
 #include <array>
 #include <cstddef>
@@ -7,7 +7,7 @@
 
 #include "bufferline.h"
 #include "filters/splitter.h"
-#include "flexarray.h"
+#include "flexarray.hpp"
 
 
 class FrontStablizer {
@@ -30,4 +30,4 @@ public:
     DEF_FAM_NEWDEL(FrontStablizer, ChannelFilters)
 };
 
-#endif /* CORE_FRONT_STABLIZER_H */
+#endif /* CORE_FRONT_STABLIZER_HPP */

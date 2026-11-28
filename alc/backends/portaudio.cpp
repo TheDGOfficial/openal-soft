@@ -21,12 +21,14 @@
 #include "config.h"
 
 #include <cstring>
+#include <span>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 #include "alc/alconfig.h"
 #include "alc/events.h"
 #include "dlopennote.h"
-#include "dynload.h"
 
 #include <portaudio.h>
 
@@ -37,6 +39,7 @@ import backends.base;
 import backends.exception;
 import core.device;
 import core.logging;
+import dynload;
 import gsl;
 import numeric;
 import ringbuffer;
@@ -53,6 +56,7 @@ import zudl;
 #include "alformatzsv.hpp"
 #include "core/device.h"
 #include "core/logging.h"
+#include "dynload.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"
 #include "ringbuffer.hpp"

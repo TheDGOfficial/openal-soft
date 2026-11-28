@@ -17,17 +17,18 @@
 #include <intrin.h>
 #endif
 
-#include <bit>
 #include <cctype>
-#include <ranges>
 
-#if HAVE_CXXMODULES
+/* HACK: MSVC seems to crash here with modules. */
+#if HAVE_CXXMODULES && !defined(_MSVC_STL_UPDATE)
 import common.std;
 
 #else
 
 #include <algorithm>
 #include <array>
+#include <bit>
+#include <ranges>
 #include <string>
 #endif
 

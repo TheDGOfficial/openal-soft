@@ -23,17 +23,16 @@
 
 #include <jni.h>
 
-#include <bit>
 #include <cstdlib>
 #include <cstring>
-#include <iterator>
 #include <memory>
-#include <ranges>
+#include <span>
+#include <string_view>
+#include <vector>
 
 #include "alc/events.h"
 #include "althrd_setname.h"
 #include "dlopennote.h"
-#include "dynload.h"
 
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
@@ -47,6 +46,7 @@ import backends.exception;
 import core.device;
 import core.helpers;
 import core.logging;
+import dynload;
 import gsl;
 import opthelpers;
 import ringbuffer;
@@ -56,9 +56,13 @@ import zudl;
 #else
 
 #include <array>
+#include <bit>
 #include <functional>
+#include <iterator>
 #include <mutex>
 #include <new>
+#include <ranges>
+#include <string>
 #include <thread>
 
 #include "alc/backends/base.hpp"
@@ -67,6 +71,7 @@ import zudl;
 #include "core/device.h"
 #include "core/helpers.hpp"
 #include "core/logging.h"
+#include "dynload.hpp"
 #include "gsl/gsl"
 #include "opthelpers.hpp"
 #include "ringbuffer.hpp"

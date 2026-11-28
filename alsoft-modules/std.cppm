@@ -2,22 +2,28 @@ module;
 
 #include <algorithm>
 #include <array>
+#include <bit>
+#include <bitset>
 #include <chrono>
 #include <cmath>
 #include <compare>
 #include <condition_variable>
+#include <deque>
 #include <exception>
 #include <fstream>
 #include <functional>
 #include <ios>
 #include <iostream>
 #include <istream>
+#include <iterator>
 #include <limits>
 #include <mutex>
 #include <new>
 #include <numbers>
 #include <optional>
 #include <ostream>
+#include <ranges>
+#include <ratio>
 #include <source_location>
 #include <sstream>
 #include <stdexcept>
@@ -226,6 +232,24 @@ export namespace std {
     /* array */
     using std::array;
     using std::to_array;
+
+    /* bit */
+    using std::endian;
+    using std::bit_cast;
+    using std::has_single_bit;
+    using std::bit_ceil;
+    using std::bit_floor;
+    using std::bit_width;
+    using std::rotl;
+    using std::rotr;
+    using std::countl_zero;
+    using std::countl_one;
+    using std::countr_zero;
+    using std::countr_one;
+    using std::popcount;
+
+    /* bitset */
+    using std::bitset;
 
     /* chrono */
     namespace chrono {
@@ -439,6 +463,9 @@ export namespace std {
     using std::cv_status;
     using std::notify_all_at_thread_exit;
 
+    /* deque */
+    using std::deque;
+
     /* exception */
     using std::exception;
     using std::nested_exception;
@@ -556,6 +583,106 @@ export namespace std {
     using std::io_errc;
     using std::iostream_category;
 
+    /* iterator */
+    using std::indirectly_readable;
+    using std::indirectly_writable;
+    using std::weakly_incrementable;
+    using std::incrementable;
+    using std::input_or_output_iterator;
+    using std::sentinel_for;
+    using std::sized_sentinel_for;
+    using std::input_iterator;
+    using std::output_iterator;
+    using std::forward_iterator;
+    using std::bidirectional_iterator;
+    using std::random_access_iterator;
+    using std::contiguous_iterator;
+    using std::indirectly_unary_invocable;
+    using std::indirectly_regular_unary_invocable;
+    using std::indirect_unary_predicate;
+    using std::indirect_binary_predicate;
+    using std::indirect_equivalence_relation;
+    using std::indirect_strict_weak_order;
+    using std::indirectly_movable;
+    using std::indirectly_movable_storable;
+    using std::indirectly_copyable;
+    using std::indirectly_copyable_storable;
+    using std::indirectly_swappable;
+    using std::indirectly_comparable;
+    using std::permutable;
+    using std::mergeable;
+    using std::sortable;
+    using std::indirect_result_t;
+    using std::projected;
+    using std::incrementable_traits;
+    using std::indirectly_readable_traits;
+    using std::iter_value_t;
+    using std::iter_reference_t;
+    using std::iter_difference_t;
+    using std::iter_rvalue_reference_t;
+    using std::iter_common_reference_t;
+    using std::iterator_traits;
+    using std::input_iterator_tag;
+    using std::output_iterator_tag;
+    using std::forward_iterator_tag;
+    using std::bidirectional_iterator_tag;
+    using std::random_access_iterator_tag;
+    using std::contiguous_iterator_tag;
+    using std::reverse_iterator;
+    using std::move_iterator;
+    using std::move_sentinel;
+    using std::common_iterator;
+    using std::default_sentinel_t;
+    using std::counted_iterator;
+    using std::unreachable_sentinel_t;
+    using std::back_insert_iterator;
+    using std::front_insert_iterator;
+    using std::insert_iterator;
+    using std::istream_iterator;
+    using std::ostream_iterator;
+    using std::istreambuf_iterator;
+    using std::ostreambuf_iterator;
+    using std::unreachable_sentinel;
+    using std::default_sentinel;
+    using std::make_reverse_iterator;
+    using std::make_move_iterator;
+    using std::front_inserter;
+    using std::back_inserter;
+    using std::inserter;
+    using std::advance;
+    using std::distance;
+    using std::next;
+    using std::prev;
+    namespace ranges {
+        /* HACK: Implementation details for various STLs, which use objects
+         * with a function call operator in an inline namespace to avoid
+         * collisions with friend functions of the same names.
+         */
+#if defined(__GLIBCXX__)
+        inline namespace _Cpo {
+            using _Cpo::iter_move;
+            using _Cpo::iter_swap;
+        }
+#elif defined(_LIBCPP_VERSION)
+        inline namespace __cpo {
+            using __cpo::iter_move;
+            using __cpo::iter_swap;
+        }
+#elif defined(_MSVC_STL_UPDATE)
+        inline namespace _Cpos {
+            using _Cpos::iter_move;
+            using _Cpos::iter_swap;
+        }
+#else
+        using std::ranges::iter_move;
+        using std::ranges::iter_swap;
+#endif
+        using std::ranges::advance;
+        using std::ranges::distance;
+        using std::ranges::next;
+        using std::ranges::prev;
+    }
+
     /* limits */
     using std::numeric_limits;
     using std::float_round_style;
@@ -629,6 +756,137 @@ export namespace std {
     using std::nullopt_t;
     using std::nullopt;
     using std::make_optional;
+
+    /* ranges */
+    namespace ranges {
+        using std::ranges::range;
+        using std::ranges::borrowed_range;
+        using std::ranges::sized_range;
+        using std::ranges::view;
+        using std::ranges::input_range;
+        using std::ranges::output_range;
+        using std::ranges::forward_range;
+        using std::ranges::bidirectional_range;
+        using std::ranges::random_access_range;
+        using std::ranges::contiguous_range;
+        using std::ranges::common_range;
+        using std::ranges::viewable_range;
+        using std::ranges::iterator_t;
+        using std::ranges::sentinel_t;
+        using std::ranges::range_difference_t;
+        using std::ranges::range_size_t;
+        using std::ranges::range_value_t;
+        using std::ranges::range_reference_t;
+        using std::ranges::range_rvalue_reference_t;
+        using std::ranges::range_common_reference_t;
+        using std::ranges::view_interface;
+        using std::ranges::subrange;
+        using std::ranges::dangling;
+        using std::ranges::borrowed_iterator_t;
+        using std::ranges::borrowed_subrange_t;
+        using std::ranges::empty_view;
+        using std::ranges::single_view;
+        using std::ranges::iota_view;
+        using std::ranges::basic_istream_view;
+        using std::ranges::istream_view;
+        using std::ranges::wistream_view;
+        using std::ranges::ref_view;
+        using std::ranges::owning_view;
+        using std::ranges::filter_view;
+        using std::ranges::transform_view;
+        using std::ranges::take_view;
+        using std::ranges::take_while_view;
+        using std::ranges::drop_view;
+        using std::ranges::drop_while_view;
+        using std::ranges::join_view;
+        using std::ranges::lazy_split_view;
+        using std::ranges::split_view;
+        using std::views::counted;
+        using std::ranges::common_view;
+        using std::ranges::reverse_view;
+        using std::ranges::elements_view;
+        using std::ranges::keys_view;
+        using std::ranges::values_view;
+        using std::ranges::begin;
+        using std::ranges::end;
+        using std::ranges::cbegin;
+        using std::ranges::cend;
+        using std::ranges::rbegin;
+        using std::ranges::rend;
+        using std::ranges::crbegin;
+        using std::ranges::crend;
+        using std::ranges::size;
+        using std::ranges::ssize;
+        using std::ranges::empty;
+        using std::ranges::data;
+        using std::ranges::cdata;
+        using std::ranges::subrange_kind;
+        using std::ranges::get;
+        namespace views {
+            using std::ranges::views::empty;
+            using std::ranges::views::single;
+            using std::ranges::views::iota;
+            using std::ranges::views::istream;
+            using std::ranges::views::all_t;
+            using std::ranges::views::all;
+            using std::ranges::views::filter;
+            using std::ranges::views::transform;
+            using std::ranges::views::take;
+            using std::ranges::views::take_while;
+            using std::ranges::views::drop;
+            using std::ranges::views::drop_while;
+            using std::ranges::views::join;
+            using std::ranges::views::lazy_split;
+            using std::ranges::views::split;
+            using std::ranges::views::counted;
+            using std::ranges::views::common;
+            using std::ranges::views::reverse;
+            using std::ranges::views::elements;
+            using std::ranges::views::keys;
+            using std::ranges::views::values;
+        }
+#if defined(_LIBCPP_VERSION)
+        /* Implementation detail for libc++, which uses this accessible
+         * operator to handle piping adaptors.
+         */
+        using std::ranges::operator|;
+#elif defined(_MSVC_STL_UPDATE)
+        namespace _Pipe {
+            using _Pipe::operator|;
+        }
+#endif
+    }
+    namespace views = std::ranges::views;
+    using std::ranges::get;
+
+    /* ratio */
+    using std::ratio;
+    using std::ratio_add;
+    using std::ratio_subtract;
+    using std::ratio_multiply;
+    using std::ratio_divide;
+    using std::ratio_equal;
+    using std::ratio_not_equal;
+    using std::ratio_less;
+    using std::ratio_less_equal;
+    using std::ratio_greater;
+    using std::ratio_greater_equal;
+    using std::atto;
+    using std::femto;
+    using std::pico;
+    using std::nano;
+    using std::micro;
+    using std::milli;
+    using std::centi;
+    using std::deci;
+    using std::deca;
+    using std::hecto;
+    using std::kilo;
+    using std::mega;
+    using std::giga;
+    using std::tera;
+    using std::peta;
+    using std::exa;
 
     /* source_location */
     using std::source_location;
@@ -765,6 +1023,9 @@ export namespace std {
     using std::swap;
 
     using std::operator+;
+    using std::operator&;
+    using std::operator|;
+    using std::operator^;
     using std::operator>>;
     using std::operator<<;
     using std::operator==;

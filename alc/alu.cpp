@@ -27,21 +27,17 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <functional>
-#include <iterator>
 #include <memory>
 #include <span>
 #include <string_view>
 
 #include "core/bformatdec.h"
-#include "core/bs2b.h"
 #include "core/bsinc_defs.h"
 #include "core/bufferline.h"
 #include "core/cpu_caps.h"
 #include "core/filters/biquad.h"
 #include "core/filters/nfc.h"
 #include "core/fpu_ctrl.h"
-#include "core/hrtf.h"
 #include "core/mastering.h"
 #include "core/mixer.h"
 #include "core/mixer/hrtfdefs.h"
@@ -50,7 +46,6 @@
 #include "core/storage_formats.h"
 #include "core/uhjfilter.h"
 #include "core/voice_change.h"
-#include "core/front_stablizer.h"
 #include "intrusive_ptr.h"
 #include "vecmat.h"
 
@@ -62,6 +57,7 @@ import atomic;
 import cemath;
 import core.ambi_utils;
 import core.async_event;
+import core.bs2b;
 import core.bsinc_tables;
 import core.buffer_storage;
 import core.context;
@@ -69,6 +65,8 @@ import core.cubic_tables;
 import core.device;
 import core.effects.base;
 import core.effectslot;
+import core.front_stablizer;
+import core.hrtf;
 import core.hrtfstore;
 import core.mixer.defs;
 import core.voice;
@@ -86,6 +84,8 @@ import zudl;
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <functional>
+#include <iterator>
 #include <limits>
 #include <numbers>
 #include <optional>
@@ -99,6 +99,7 @@ import zudl;
 #include "cemath.hpp"
 #include "core/ambi_utils.hpp"
 #include "core/async_event.hpp"
+#include "core/bs2b.hpp"
 #include "core/bsinc_tables.hpp"
 #include "core/context.h"
 #include "core/cubic_tables.hpp"
@@ -107,6 +108,8 @@ import zudl;
 #include "core/devfmttraits.hpp"
 #include "core/effects/base.hpp"
 #include "core/effectslot.h"
+#include "core/front_stablizer.hpp"
+#include "core/hrtf.hpp"
 #include "core/hrtfstore.hpp"
 #include "core/mixer/defs.hpp"
 #include "core/voice.h"

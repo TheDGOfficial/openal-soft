@@ -21,14 +21,12 @@
 #include "config.h"
 
 #include <atomic>
-#include <bit>
 #include <concepts>
 #include <cstdlib>
 #include <cstdint>
 #include <cstring>
 #include <cerrno>
 #include <ctime>
-#include <iterator>
 #include <memory>
 #include <span>
 #include <string_view>
@@ -37,7 +35,6 @@
 #include "alc/alconfig.h"
 #include "alc/events.h"
 #include "dlopennote.h"
-#include "dynload.h"
 #include "pragmadefs.h"
 
 /* Ignore warnings caused by PipeWire headers (lots in standard C++ mode). GCC
@@ -124,6 +121,7 @@ import backends.exception;
 import core.device;
 import core.helpers;
 import core.logging;
+import dynload;
 import filesystem;
 import fmtlib;
 import format;
@@ -138,9 +136,11 @@ import zstring_view;
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <chrono>
 #include <cmath>
 #include <functional>
+#include <iterator>
 #include <mutex>
 #include <optional>
 #include <thread>
@@ -155,6 +155,7 @@ import zstring_view;
 #include "core/device.h"
 #include "core/helpers.hpp"
 #include "core/logging.h"
+#include "dynload.hpp"
 #include "filesystem.h"
 #include "fmt/format.h"
 #include "fmt/ranges.h"

@@ -29,20 +29,11 @@
 #endif
 
 #include <atomic>
-#include <bit>
-#include <bitset>
-#include <cctype>
-#include <climits>
-#include <csignal>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
-#include <functional>
-#include <iterator>
 #include <memory>
-#include <ranges>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -53,19 +44,16 @@
 #include "alu.h"
 #include "core/ambidefs.h"
 #include "core/bformatdec.h"
-#include "core/bs2b.h"
 #include "core/cpu_caps.h"
 #include "core/filters/nfc.h"
 #include "core/fpu_ctrl.h"
-#include "core/front_stablizer.h"
-#include "core/hrtf.h"
 #include "core/mastering.h"
+#include "core/mixer/hrtfdefs.h"
 #include "core/mixparams.hpp"
 #include "core/tsmefilter.hpp"
 #include "core/uhjfilter.h"
 #include "core/voice_change.h"
 #include "export_list.h"
-#include "flexarray.h"
 #include "inprogext.h"
 #include "intrusive_ptr.h"
 
@@ -92,12 +80,16 @@ import alstring;
 import atomic;
 import backends.base;
 import backends.exception;
+import core.bs2b;
 import core.effectslot;
 import core.except;
+import core.front_stablizer;
 import core.helpers;
+import core.hrtf;
 import core.logging;
 import core.voice;
 import envutils;
+import flexarray;
 import fmtlib;
 import format;
 import gsl;
@@ -114,14 +106,19 @@ import eax.effect;
 
 #include <algorithm>
 #include <array>
+#include <bit>
+#include <bitset>
 #include <chrono>
 #include <cmath>
 #include <exception>
+#include <functional>
+#include <iterator>
 #include <limits>
 #include <mutex>
 #include <new>
 #include <numbers>
 #include <optional>
+#include <ranges>
 #include <source_location>
 #include <stdexcept>
 #include <string>
@@ -146,12 +143,16 @@ import eax.effect;
 #include "alformat.hpp"
 #include "alstring.h"
 #include "atomic.hpp"
+#include "core/bs2b.hpp"
 #include "core/effectslot.h"
 #include "core/except.hpp"
+#include "core/front_stablizer.hpp"
 #include "core/helpers.hpp"
+#include "core/hrtf.hpp"
 #include "core/logging.h"
 #include "core/voice.h"
 #include "envutils.hpp"
+#include "flexarray.hpp"
 #include "fmt/format.h"
 #include "fmt/ranges.h"
 #include "gsl/gsl"
@@ -1339,7 +1340,7 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
                 break;
 
             case ATTRIBUTE(ALC_MAX_AUXILIARY_SENDS)
-                numSends = gsl::narrow<ALCuint>(std::clamp<ALCint>(attrvalue, 0, MaxSendCount));
+                numSends = al::saturating_cast<ALCuint>(std::min<ALCint>(attrvalue, MaxSendCount));
                 break;
 
             case ATTRIBUTE(ALC_HRTF_SOFT)
@@ -1381,7 +1382,7 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
                 break;
 
             case ATTRIBUTE(ALC_AUXILIARY_EFFECT_SLOTS_SOFT)
-                numSlots = static_cast<ALCuint>(std::max<ALCint>(attrvalue, 0));
+                numSlots = al::saturating_cast<ALCuint>(attrvalue);
                 break;
 
             default:
@@ -1627,7 +1628,7 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
         }
     }
 
-    aluInitRenderer(&device, hrtf_id, stereomode);
+    aluInitRenderer(device, hrtf_id, stereomode);
 
     /* Calculate the max number of sources, and split them between the mono and
      * stereo count given the requested number of stereo sources.
@@ -1652,10 +1653,8 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
         numSends = std::min(numSends, std::clamp(*sendsopt, 0u, unsigned{MaxSendCount}));
     device.NumAuxSends = numSends;
 
-    if(auto const slotsopt = device.configValue<unsigned>({}, "slots"sv);
-        slotsopt.value_or(0u) > 0)
-        numSlots = std::clamp(*slotsopt, 1u,
-            unsigned{std::numeric_limits<int>::max()});
+    if(auto const slotsopt = device.configValue<unsigned>({}, "slots"sv); slotsopt.value_or(0) > 0)
+        numSlots = std::min(*slotsopt, unsigned{std::numeric_limits<int>::max()});
     device.AuxiliaryEffectSlotMax = numSlots;
 
     TRACE("Max sources: {} ({} + {}), effect slots: {}, sends: {}",
@@ -1786,23 +1785,23 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
     std::ranges::for_each(*device.mContexts.load(), [&device](ContextBase *ctxbase)
     {
         /* NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast) */
-        auto const context = gsl::make_not_null(static_cast<al::Context*>(ctxbase));
+        auto& context = *static_cast<al::Context*>(ctxbase);
 
-        auto proplock = std::unique_lock{context->mPropLock};
-        auto slotlock = std::unique_lock{context->mEffectSlotLock};
+        auto proplock = std::unique_lock{context.mPropLock};
+        auto slotlock = std::unique_lock{context.mEffectSlotLock};
 
         /* Remove unused effect slot clusters. */
-        auto slotcluster_rem = std::ranges::remove_if(context->mEffectSlotClusters,
-            [](ContextBase::EffectSlotCluster const &clusterptr) -> bool
+        auto slotcluster_rem = std::ranges::remove_if(context.mEffectSlotClusters,
+            [](ContextBase::EffectSlotCluster const& clusterptr) -> bool
         {
             return std::ranges::none_of(*clusterptr, &EffectSlotBase::InUse);
         });
-        context->mEffectSlotClusters.erase(slotcluster_rem.begin(), slotcluster_rem.end());
+        context.mEffectSlotClusters.erase(slotcluster_rem.begin(), slotcluster_rem.end());
 
         /* Free all wet buffers. Any in use will be reallocated with an updated
          * configuration in aluInitEffectPanning.
          */
-        std::ranges::for_each(context->mEffectSlotClusters
+        std::ranges::for_each(context.mEffectSlotClusters
             | std::views::transform(al::dereference{})
             | std::views::join, [](EffectSlotBase &slot)
         {
@@ -1811,13 +1810,13 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
             slot.Wet.Buffer = {};
         });
 
-        if(auto *slot = context->mDefaultSlot.get())
+        if(auto* slot = context.mDefaultSlot.get())
         {
-            const auto slotbase = slot->mSlot;
-            aluInitEffectPanning(slotbase, context);
+            auto& slotbase = *slot->mSlot;
+            aluInitEffectPanning(slotbase, device.mAmbiOrder);
 
-            if(auto *props = slotbase->Update.exchange(nullptr, std::memory_order_relaxed))
-                AtomicReplaceHead(context->mFreeEffectSlotProps, props);
+            if(auto *props = slotbase.Update.exchange(nullptr, std::memory_order_relaxed))
+                AtomicReplaceHead(context.mFreeEffectSlotProps, props);
 
             auto *state = slot->mEffect.State.get();
             state->mOutTarget = device.Dry.Buffer;
@@ -1825,10 +1824,10 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
             slot->mPropsDirty = true;
         }
 
-        if(auto *curarray = context->mActiveAuxSlots.load(std::memory_order_relaxed))
+        if(auto *curarray = context.mActiveAuxSlots.load(std::memory_order_relaxed))
             std::ranges::fill(*curarray | std::views::drop(curarray->size()>>1), nullptr);
-        std::ranges::for_each(context->mEffectSlotList,
-            [&device, context](EffectSlotSubList &sublist)
+        std::ranges::for_each(context.mEffectSlotList,
+            [&device, &context](EffectSlotSubList& sublist)
         {
             auto usemask = ~sublist.mFreeMask;
             while(usemask != 0)
@@ -1837,11 +1836,11 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
                 auto &slot = (*sublist.mEffectSlots)[idx];
                 usemask &= ~(std::uint64_t{1} << idx);
 
-                const auto slotbase = slot.mSlot;
-                aluInitEffectPanning(slotbase, context);
+                auto& slotbase = *slot.mSlot;
+                aluInitEffectPanning(slotbase, device.mAmbiOrder);
 
-                if(auto *props = slotbase->Update.exchange(nullptr, std::memory_order_relaxed))
-                    AtomicReplaceHead(context->mFreeEffectSlotProps, props);
+                if(auto *props = slotbase.Update.exchange(nullptr, std::memory_order_relaxed))
+                    AtomicReplaceHead(context.mFreeEffectSlotProps, props);
 
                 auto &state = *slot.mEffect.State;
                 state.mOutTarget = device.Dry.Buffer;
@@ -1851,13 +1850,13 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
         });
 
         /* Clear all effect slot props to let them get allocated again. */
-        context->mEffectSlotPropClusters.clear();
-        context->mFreeEffectSlotProps.store(nullptr, std::memory_order_relaxed);
+        context.mEffectSlotPropClusters.clear();
+        context.mFreeEffectSlotProps.store(nullptr, std::memory_order_relaxed);
         slotlock.unlock();
 
-        auto srclock = std::unique_lock{context->mSourceLock};
+        auto srclock = std::unique_lock{context.mSourceLock};
         const auto num_sends = device.NumAuxSends;
-        std::ranges::for_each(context->mSourceList, [num_sends](SourceSubList &sublist)
+        std::ranges::for_each(context.mSourceList, [num_sends](SourceSubList& sublist)
         {
             auto usemask = ~sublist.mFreeMask;
             while(usemask != 0)
@@ -1875,7 +1874,7 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
             }
         });
 
-        std::ranges::for_each(context->getVoicesSpan(), [&device,num_sends,context](Voice *voice)
+        std::ranges::for_each(context.getVoicesSpan(), [&device, num_sends, &context](Voice* voice)
         {
             /* Clear extraneous property set sends. */
             std::ranges::fill(voice->mProps.Send | std::views::drop(num_sends),
@@ -1886,7 +1885,7 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
                 std::ranges::fill(chan.mWetParams | std::views::drop(num_sends), SendParams{});
 
             if(auto *props = voice->mUpdate.exchange(nullptr, std::memory_order_relaxed))
-                AtomicReplaceHead(context->mFreeVoiceProps, props);
+                AtomicReplaceHead(context.mFreeVoiceProps, props);
 
             /* Force the voice to "Stopped" if it was stopping. */
             auto vstate = Voice::Stopping;
@@ -1899,14 +1898,14 @@ auto UpdateDeviceParams(al::Device& device, std::span<AttributePair const> const
         });
 
         /* Clear all voice props to let them get allocated again. */
-        context->mFreeVoiceProps.store(nullptr, std::memory_order_relaxed);
-        context->mVoicePropClusters.clear();
+        context.mFreeVoiceProps.store(nullptr, std::memory_order_relaxed);
+        context.mVoicePropClusters.clear();
         srclock.unlock();
 
-        context->mPropsDirty = false;
-        UpdateContextProps(*context);
-        UpdateAllEffectSlotProps(*context);
-        UpdateAllSourceProps(*context);
+        context.mPropsDirty = false;
+        UpdateContextProps(context);
+        UpdateAllEffectSlotProps(context);
+        UpdateAllSourceProps(context);
     });
     mixer_mode.leave();
 
@@ -1941,7 +1940,7 @@ auto ResetDeviceParams(al::Device& device, const std::span<const AttributePair> 
     if(!device.Connected.load(std::memory_order_relaxed))
     {
         /* Make sure disconnection is finished before continuing on. */
-        std::ignore = device.waitForMix();
+        device.waitForCurrentMix();
 
         std::ranges::for_each(*device.mContexts.load(std::memory_order_acquire),
             [](ContextBase *ctxbase)
@@ -2706,8 +2705,8 @@ try {
             std::atomic_thread_fence(std::memory_order_acquire);
         } while(refcount != dev->mMixCount.load(std::memory_order_relaxed));
 
-        valuespan[0] = nanoseconds{clocksec + clocknsec
-            + nanoseconds{seconds{samplecount}}/dev->mSampleRate}.count();
+        clocknsec += nanoseconds{seconds{samplecount}} / dev->mSampleRate;
+        valuespan[0] = nanoseconds{clocksec + clocknsec}.count();
         break;
     }
 
@@ -3451,7 +3450,7 @@ try {
     InitConfig();
 
     /* Make sure the device name, if specified, is us. */
-    if(deviceName && strcmp(deviceName, GetDefaultName()) != 0)
+    if(deviceName && std::string_view{deviceName} != GetDefaultName())
     {
         al::Device::SetGlobalError(ALC_INVALID_VALUE);
         return nullptr;

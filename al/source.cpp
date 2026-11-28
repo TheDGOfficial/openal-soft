@@ -21,15 +21,10 @@
 #include "config.h"
 
 #include <atomic>
-#include <bit>
-#include <bitset>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
-#include <deque>
-#include <iterator>
 #include <memory>
-#include <ranges>
 #include <span>
 #include <string_view>
 #include <type_traits>
@@ -41,7 +36,6 @@
 #include "core/storage_formats.h"
 #include "core/voice_change.h"
 #include "direct_defs.h"
-#include "flexarray.h"
 #include "intrusive_ptr.h"
 
 #if ALSOFT_EAX
@@ -77,18 +71,24 @@ import numeric;
 import opthelpers;
 import zudl;
 #include "gsl_macros.hpp"
+#include "opthelper_macros.hpp"
 
 #else
 
 #include <algorithm>
 #include <array>
+#include <bit>
+#include <bitset>
 #include <chrono>
 #include <cmath>
+#include <deque>
 #include <functional>
+#include <iterator>
 #include <limits>
 #include <mutex>
 #include <new>
 #include <optional>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -912,7 +912,6 @@ auto AllocSource(al::Context& context) noexcept -> gsl::not_null<al::Source*>
     auto const lidx = gsl::narrow_cast<ALuint>(std::distance(context.mSourceList.begin(),
         sublist));
     auto const slidx = as_unsigned(std::countr_zero(sublist->mFreeMask));
-    ASSUME(slidx < 64);
 
     auto const source = gsl::make_not_null(std::construct_at(&(*sublist->mSources)[slidx]));
 #if ALSOFT_EAX

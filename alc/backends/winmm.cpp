@@ -25,10 +25,9 @@
 #include <mmreg.h>
 
 #include <atomic>
-#include <bit>
 #include <cstddef>
 #include <cstdint>
-#include <ranges>
+#include <string_view>
 #include <vector>
 
 #include "alc/events.h"
@@ -58,6 +57,8 @@ import zudl;
 
 #include <algorithm>
 #include <array>
+#include <bit>
+#include <ranges>
 #include <string>
 #include <thread>
 

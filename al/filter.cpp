@@ -20,12 +20,10 @@
 
 #include "config.h"
 
-#include <bit>
 #include <cstddef>
 #include <cstdint>
-#include <iterator>
 #include <memory>
-#include <ranges>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -50,8 +48,11 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <bit>
+#include <iterator>
 #include <mutex>
 #include <new>
+#include <ranges>
 #include <variant>
 
 #include "AL/al.h"
@@ -333,7 +334,6 @@ auto AllocFilter(al::Device& device) noexcept -> gsl::not_null<al::Filter*>
         [](FilterSubList const &slist) { return slist.mFreeMask != 0; });
     auto const lidx = gsl::narrow_cast<ALuint>(std::distance(device.FilterList.begin(), sublist));
     auto const slidx = as_unsigned(std::countr_zero(sublist->mFreeMask));
-    ASSUME(slidx < 64);
 
     auto filter = gsl::make_not_null(std::construct_at(&(*sublist->mFilters)[slidx]));
     InitFilterParams(*filter, AL_FILTER_NULL);

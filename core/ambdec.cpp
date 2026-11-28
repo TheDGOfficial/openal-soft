@@ -1,18 +1,22 @@
 
 #include "config.h"
 
-#include "ambdec.h"
-
-#include <bit>
 #include <cctype>
 #include <cstddef>
-#include <iterator>
 #include <span>
+#include <string_view>
 
-#if HAVE_CXXMODULES
+#include "ambidefs.h"
+
+/* HACK: GCC 16 seems to have an issue with the modules here, complaining about
+ * "recursive lazy load" and "failed to load pendings".
+ */
+#if HAVE_CXXMODULES && (defined(__INTEL_COMPILER) || defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 16)
 import common.std;
 
 import alstring;
+import core.ambdec;
+import expected;
 import filesystem;
 import format;
 import gsl;
@@ -22,13 +26,17 @@ import zudl;
 #else
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <istream>
+#include <iterator>
 #include <sstream>
 #include <string>
 
 #include "alformat.hpp"
 #include "alstring.h"
+#include "core/ambdec.hpp"
+#include "expected.hpp"
 #include "filesystem.h"
 #include "gsl/gsl"
 #include "numeric.hpp"

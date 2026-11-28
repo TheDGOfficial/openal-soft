@@ -24,7 +24,6 @@
 #include <atomic>
 #include <concepts>
 #include <cstring>
-#include <ranges>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -32,7 +31,6 @@
 #include "alc/alconfig.h"
 #include "alc/events.h"
 #include "dlopennote.h"
-#include "dynload.h"
 
 #include <pulse/pulseaudio.h>
 
@@ -43,6 +41,7 @@ import backends.base;
 import backends.exception;
 import core.device;
 import core.logging;
+import dynload;
 import envutils;
 import format;
 import gsl;
@@ -60,6 +59,7 @@ import zudl;
 #include <limits>
 #include <mutex>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <utility>
 
@@ -69,6 +69,7 @@ import zudl;
 #include "alformatzsv.hpp"
 #include "core/device.h"
 #include "core/logging.h"
+#include "dynload.hpp"
 #include "envutils.hpp"
 #include "gsl/gsl"
 #include "numeric.hpp"

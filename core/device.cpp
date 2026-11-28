@@ -1,23 +1,41 @@
 
 #include "config.h"
 
-#include "bformatdec.h"
-#include "bs2b.h"
-#include "front_stablizer.h"
-#include "hrtf.h"
-#include "mastering.h"
+#include <span>
+
+#include "core/bformatdec.h"
+#include "core/mastering.h"
 
 #if HAVE_CXXMODULES
+/* HACK: GCC 16 seems to have an issue when trying to instantiate
+ * FlexArray<ContextBase*>::Create. Including the device header seems to work
+ * around it.
+ */
+#if !defined(__INTEL_COMPILER) && !defined(__clang__) && defined(__GNUC__) && __GNUC__ == 16
+#include "core/device.h"
+#endif
+import common.std;
+
+import core.bs2b;
 import core.context;
 import core.device;
+import core.front_stablizer;
+import core.hrtf;
 import core.hrtfstore;
+import flexarray;
 import gsl;
 
 #else
 
+#include <algorithm>
+
+#include "core/bs2b.hpp"
 #include "core/context.h"
 #include "core/device.h"
+#include "core/front_stablizer.hpp"
+#include "core/hrtf.hpp"
 #include "core/hrtfstore.hpp"
+#include "flexarray.hpp"
 #include "gsl/gsl"
 #endif
 
